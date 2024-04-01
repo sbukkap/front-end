@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import  {Navbar}  from "../components/Navbar";
 import  {Header}  from "../components/header";
 import { Features } from "../components/features";
 import { About } from "../components/about";
@@ -7,6 +6,7 @@ import { Services } from "../components/services";
 import { Contact } from "../components/contact";
 import JsonData from "../data/data.json";
 import SmoothScroll from "smooth-scroll";
+
 
 import "./Home.css";
 export const scroll = new SmoothScroll('a[href*="#"]', {
@@ -19,6 +19,12 @@ const Home = () => {
   useEffect(() => {
     setLandingPageData(JsonData);
   }, []);
+
+  // // Set initial location to somewhere in the USA
+  // const [selectedLocation, setSelectedLocation] = useState({
+  //   lat: 37.7749, // Defaulting to San Francisco's latitude
+  //   lng: -122.4194, // Defaulting to San Francisco's longitude
+  // });
 
   return (
     <div>

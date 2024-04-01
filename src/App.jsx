@@ -8,9 +8,9 @@ import Listingpage from "./pages/Listingpage";
 import { Navbar } from "./components/Navbar";
 import styles from "./App.module.css";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import { About } from "./components/about";
 import PrivateRoute from "./components/RoutingFolder/PrivateRoute";
-import CRUDListings from "./pages/Admin/CRUDListings";
+import AdminRentalApprove from "./pages/Admin/AdminRentalApprove";
+import ItemLocation from "./components/MapComponents/ItemLocation";
 
 function App() {
   return (
@@ -25,8 +25,9 @@ function App() {
           <Route path="/Createlisting" element={<Createlisting />} />
           <Route path="/Listingpage" element={<Listingpage />} />
           <Route element= {<PrivateRoute/>}>
-            <Route path='/modify-listing' element={<CRUDListings/>}/>
+            <Route path='/modify-listing' element={<AdminRentalApprove/>}/>
           </Route>
+          <Route path="/itemLocation" element={<ItemLocation/>} />
         </Routes>
       </BrowserRouter>
     </div>
