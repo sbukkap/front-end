@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { FaSearch } from "react-icons/fa";
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const ListingCard = ({ car }) => {
   // Define a placeholder image path
@@ -40,6 +43,7 @@ const FilterDropdown = ({ label, options, selectedOption, onChange }) => {
   return (
     <div className="mb-4">
       <div className="relative">
+        {/* <label>{label}</label> */}
         <select
           className="appearance-none w-full border border-gray-300 rounded px-3 py-2 pr-10"
           value={selectedOption}
@@ -47,7 +51,7 @@ const FilterDropdown = ({ label, options, selectedOption, onChange }) => {
         >
           <option value="">{label}</option>
           {options.map((option) => (
-            <option key={option} value={option}>{option}</option>
+            <option key={option}>{option}</option>
           ))}
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -60,6 +64,10 @@ const FilterDropdown = ({ label, options, selectedOption, onChange }) => {
   );
 };
 
+// const Filters = ({ onChange }) => {
+  
+// };
+
 export default function Listingpage() {
   // Initialize state with empty array or example data if you want to show something initially
   const [cars, setCars] = useState([]);
@@ -68,7 +76,36 @@ export default function Listingpage() {
   const [filters, setFilters] = useState({}); // State to hold filter values
 
   const { currUser } = useSelector((state) => state.user_mod);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = async () => {
+    console.log(searchQuery)
   
+    if (searchQuery.trim() !== "") {
+      try {
+        const response = await fetch(`/api/v1/cars/searchCars?query=${searchQuery.trim()}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${currUser?.data?.token}`
+          }
+        });
+  
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+  
+        const data = await response.json();
+        setCars(data.data);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        setError("Failed to fetch search results. Please try again later.");
+      } finally {
+        setIsLoading(false); // End loading
+      }
+    }
+  };
+
   useEffect(() => {
     async function fetchListings() {
       setIsLoading(true); // Begin loading
@@ -131,64 +168,147 @@ export default function Listingpage() {
     fetchFilters();
   }, [filters]); // Run whenever filters change
 
-  // Function to handle filter changes
-  const handleFilterChange = (name, value) => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
 
-//   return (
-//     <main className="container mx-auto p-4 justify-center">
-//       <h1 className="text-3xl font-bold text-center mb-6">
-//         AVAILABLE CARS FOR RENT
-//       </h1>
-//       <div className="text-center mb-4">
-//         {currUser ? (
-//           <Link
-//             to="/Createlisting"
-//             className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition duration-300"
-//           >
-//             POST YOUR CAR
-//           </Link>
-//         ) : (
-//           <Link
-//             to="/sign-in"
-//             className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition duration-300"
-//           >
-//             SIGN IN TO POST YOUR CAR
-//           </Link>
-//         )}
-//       </div>
-//       <section className="flex flex-wrap -mx-4">
-//         {isLoading ? (
-//           <p className="mx-auto">Loading...</p>
-//         ) : cars.length > 0 ? (
-//           cars.map((car) => <ListingCard key={car.id} car={car} />)
-//         ) : (
-//           <p className="mx-auto">No listings available.</p>
-//         )}
-//       </section>
-//     </main>
-//   );
-// }
+  const handleFilterChange = (name, value) => {
+    if (value.includes("-")) {
+      const [n1, n2] = name.split("-").map(String);
+      const [minValue, maxValue] = value.split("-").map(Number);
+      // const yearsInRange = Array.from({ length: maxValue - minValue + 1 }, (_, i) => minValue + i);
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [n1]: minValue,
+        [n2]: maxValue,
+      }));
+    }else if (name.includes("-")){
+      const [n1, n2] = name.split("-").map(String);
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [n1]: 0,
+        [n2]: 10000000,
+      }));
+    }
+    else {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [name]: [value],
+      }));
+    }
+  };
+  
+  // const handleFilterChange = (name, value) => {
+  //   setFilters(prevFilters => ({
+  //     ...prevFilters,
+  //     [name]: value,
+  //   }));
+  // };
 
 return (
   <main className="container mx-auto p-4 justify-center">
+    <form className="flex items-center">
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border border-gray-400 py-2 px-4 rounded-l-lg focus:outline-none"
+        />
+        <button
+          type="button"
+          className="text-white bg-black py-2 px-4 rounded-r-lg"
+          onClick={handleSearch}
+        >
+          <FaSearch />
+        </button>
+      </form>
     <h1 className="text-3xl font-bold text-center mb-6">
       AVAILABLE CARS FOR RENT
     </h1>
-    <div className="text-center mb-4">
-      {/* Filter components */}
-      <FilterDropdown
-        label="Car Make"
-        options={["Toyota", "Honda", "Ford"]} // Example options, replace with actual data
+
+
+    <div className="absolute top-50">
+    <FilterDropdown
+        label="All Cars"
+        options={["Toyota", "honda", "Ford", "Mercedes-Benz", "Audi", "BMW", "Tesla", "Lexus", "Chevrolet"]}
         onChange={(value) => handleFilterChange("carMake", value)}
       />
-      {/* Add more filter components here */}
+    </div>
 
-      {/* Post car button */}
+    <h1 className="text-3xl font-bold text-center mb-6" style={{ left: "1345px", top: "325px", position: "absolute" }}>
+      More Filters
+    </h1>
+
+    <div className="absolute top-50" style={{ left: "1355px", top: "400px", position: "absolute" }}>
+      <FilterDropdown
+        label="Year"
+        options={["2010-2015", "2015-2020", "2020-2025", "2025-2030"]}
+        onChange={(value) => handleFilterChange("minYear-maxYear", value)}
+      />
+      </div>
+
+      <div className="absolute top-50" style={{ left: "1355px", top: "450px", position: "absolute" }}>
+      <FilterDropdown
+        label="Mileage"
+        options={[]}
+        onChange={(value) => handleFilterChange("minMileage-maxMileage", value)}
+      />
+      </div>
+
+      <div className="absolute top-50" style={{ left: "1355px", top: "500px", position: "absolute" }}>
+      <FilterDropdown
+        label="Transmission"
+        options={["Manual", "Automatic"]}
+        onChange={(value) => handleFilterChange("transmission", value)}
+      />
+      </div>
+
+      <div className="absolute top-50" style={{ left: "1355px", top: "550px", position: "absolute" }}>
+      <FilterDropdown
+        label="Fueltype"
+        options={["Diesel", "Gasoline", "Electric", "Hybrid"]}
+        onChange={(value) => handleFilterChange("fuelType", value)}
+      />
+      </div>
+
+      <div className="absolute top-50" style={{ left: "1355px", top: "600px", position: "absolute" }}>
+      <FilterDropdown
+        label="Seats"
+        options={["2-seater", "3-seater", "4-seater", "5-seater", "6-seater"]}
+        onChange={(value) => handleFilterChange("minSeats-maxSeats", value)}
+      />
+      </div>
+
+      <div className="absolute top-50" style={{ left: "1355px", top: "650px", position: "absolute" }}>
+      <FilterDropdown
+        label="Price per day (USD)"
+        options={["40-50", "50-60", "60-70", "70-80", "80-90", "90-100"]}
+        onChange={(value) => handleFilterChange("minPricePerDay-maxPricePerDay", value)}
+      />
+      </div>
+
+      {/* <label htmlFor="fuelType">Fuel Type:</label>
+      <select id="fuelType" name="fuelType" onChange={handleFilterChange}>
+        <option value="">Select Fuel Type</option>
+        <option value="petrol">Petrol</option>
+        <option value="diesel">Diesel</option>
+        <option value="electric">Electric</option>
+      </select> */}
+
+      {/* <label htmlFor="minSeats">Min Seats:</label>
+      <input type="number" id="minSeats" name="minSeats" onChange={handleFilterChange} />
+      <label htmlFor="maxSeats">Max Seats:</label>
+      <input type="number" id="maxSeats" name="maxSeats" onChange={handleFilterChange} />
+
+      <label htmlFor="minPricePerDay">Min Price Per Day:</label>
+      <input type="number" id="minPricePerDay" name="minPricePerDay" onChange={handleFilterChange} />
+      <label htmlFor="maxPricePerDay">Max Price Per Day:</label>
+      <input type="number" id="maxPricePerDay" name="maxPricePerDay" onChange={handleFilterChange} />
+
+      <label htmlFor="availableFrom">Available From:</label>
+      <input type="date" id="availableFrom" name="availableFrom" onChange={handleFilterChange} />
+      <label htmlFor="availableTo">Available To:</label>
+      <input type="date" id="availableTo" name="availableTo" onChange={handleFilterChange} /> */}
+    
+    <div className="text-center mb-4">
       {currUser ? (
         <Link
           to="/Createlisting"

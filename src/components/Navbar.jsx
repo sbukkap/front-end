@@ -7,6 +7,36 @@ import { useSelector } from "react-redux";
 export const Navbar = () => {
   const [menuDraw, setMenuDraw] = useState(false);
   const { currUser } = useSelector((state) => state.user_mod);
+  
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const handleSearch = async () => {
+  //   console.log(searchQuery)
+  
+  //   if (searchQuery.trim() !== "") {
+  //     try {
+  //       const response = await fetch(`/api/v1/cars/searchCars?query=${searchQuery.trim()}`, {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${currUser?.data?.token}`
+  //         }
+  //       });
+  
+  //       if (!response.ok) {
+  //         throw new Error("Network response was not ok");
+  //       }
+  
+  //       const data = await response.json();
+  //       setCars(data.data);
+  //     } catch (error) {
+  //       console.error("Error fetching search results:", error);
+  //       setError("Failed to fetch search results. Please try again later.");
+  //     } finally {
+  //       setIsLoading(false); // End loading
+  //     }
+  //   }
+  // };
+  
 
   return (
     <nav className="navbar flex items-center justify-between px-10 py-4 bg-floralwhite">
@@ -14,19 +44,22 @@ export const Navbar = () => {
         <img src={logo} alt="Logo" className="h-10 mr-4" />
         HPASS RENTALS
       </Link>
-      <form className="flex items-center">
+      {/* <form className="flex items-center">
         <input
           type="text"
           placeholder="Search items..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="border border-gray-400 py-2 px-4 rounded-l-lg focus:outline-none"
         />
         <button
           type="button"
           className="text-white bg-black py-2 px-4 rounded-r-lg"
+          onClick={handleSearch}
         >
           <FaSearch />
         </button>
-      </form>
+      </form> */}
       <div className="md:hidden">
         <button
           className="block text-gray-800 hover:text-gray-900 focus:text-gray-900 focus:outline-none"
