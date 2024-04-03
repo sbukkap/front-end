@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   signInSuccess,
   beginingSignin,
   FailedSign,
+  setClientSecret
 } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,9 +14,39 @@ import ForgotPassword from "./ForgotPassword";
 export default function SignUp() {
   const [formValues, setFormValues] = useState({});
   const [forgotFlag, setforgotFlag] = useState(false);
-  const { loading, err } = useSelector((state) => state.user_mod);
+  const { currUser, loading, err } = useSelector((state) => state.user_mod);
   const navigator = useNavigate();
   const dispatchAction = useDispatch();
+  
+  // useEffect to trigger side effects after currUser update
+  useEffect(() => {
+    if (currUser && currUser.data && currUser.data.token) {
+      const fetchStripePayment = async () => {
+        try {
+          const stripeRes = await fetch("api/v1/rent/stripePayment", {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${currUser.data.token}` 
+            },
+            body: JSON.stringify({ items: [{ id: "payment" }] }),
+          });
+          if (!stripeRes.ok) {
+            throw new Error(`Failed to fetch client secret: ${stripeRes.status}`);
+          }
+          const stripeData = await stripeRes.json();
+          console.log("stripeData", stripeData.data.clientSecret);
+          dispatchAction(setClientSecret(stripeData.data.clientSecret));
+          navigator("/");
+        } catch (error) {
+          console.error("Error fetching client secret:", error);
+          dispatchAction(FailedSign("Error fetching client secret"));
+        }
+      };
+      fetchStripePayment();
+    }
+  }, [currUser, dispatchAction, navigator]);
+
   const formChangeInputHandler = (event) => {
     setFormValues({
       ...formValues,
@@ -45,13 +76,12 @@ export default function SignUp() {
         return;
       } else if (data.status_code === 200) {
         dispatchAction(signInSuccess(data));
-        navigator("/");
       }
     } catch (err) {
       dispatchAction(FailedSign(err.message));
     }
   };
-
+  
   return (
     <div className=" p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Welcome</h1>
