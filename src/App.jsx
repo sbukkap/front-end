@@ -11,6 +11,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivateRoute from "./components/RoutingFolder/PrivateRoute";
 import AdminRentalApprove from "./pages/Admin/AdminRentalApprove";
 import ItemLocation from "./components/MapComponents/ItemLocation";
+import CarDetailsPage from "./pages/CarDetailsPage";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./pages/Payment/CheckoutForm";
@@ -50,6 +51,7 @@ function App() {
             <Route path="/modify-listing" element={<AdminRentalApprove />} />
           </Route>
           <Route path="/itemLocation" element={<ItemLocation />} />
+          <Route path="/carDetails/:carId" element={<CarDetailsPage />} />
           {clientSecret && (
             <Route
               path="/checkout"

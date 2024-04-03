@@ -20,12 +20,12 @@ export const ListingCard = ({ car }) => {
   return (
 <div className="max-w-sm rounded overflow-hidden shadow-lg m-4 bg-white">
   <div className="h-48 bg-gray-200 flex items-center justify-center">
-    {/* Use car.imageUrl if available, otherwise use placeholder */}
     <img
-      className="object-cover h-full w-full"
-      src={car.imageUrl || placeholderImage}
-      alt={`${car.carMake} ${car.carModel}`}
-    />
+  className="object-cover h-full w-full"
+  src={(car.image_url && car.image_url[0]) || placeholderImage}
+  alt={`${car.carMake} ${car.carModel}`}
+/>
+
   </div>
   <div className="px-6 py-4">
     <div className="font-bold text-xl mb-1">{`${car.carMake} ${car.carModel}`}</div>
@@ -42,6 +42,12 @@ export const ListingCard = ({ car }) => {
         <Link to={`/itemLocation?lat=${car.location.lat}&lng=${car.location.lng}`} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           View item location
         </Link>
+        <Link
+            to={`/carDetails/${car._id}`}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            View Details
+          </Link>
       </li>
     </ul>
   </div>
@@ -74,6 +80,7 @@ export default function Listingpage() {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
+        console.log(data);
         setCars(data.data);
       } catch (error) {
         console.error("Error fetching listings:", error);

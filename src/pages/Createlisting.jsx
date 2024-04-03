@@ -21,9 +21,10 @@ export default function CreateListing() {
     availableFrom: "",
     availableTo: "",
     location: "",
+    image_url: []
   });
   
-
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const { currItemLocation } = useSelector((state) => state.item_mod);
   const navigator = useNavigate();
   
@@ -58,13 +59,42 @@ useEffect(() => {
 }, [currUser?.token, currUser?.id]); 
 
 const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevFormData => ({
-        ...prevFormData,
-        [name]: value
-    }));
+  const { name, value } = e.target;
+  setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value
+  }));
 };
 
+const handleFileChange = (e) => { // New function to handle file input change
+  setSelectedFiles(e.target.files);
+  console.log(e.target.files);
+};
+
+const uploadImages = async () => {
+  const formData = new FormData();
+  for (let file of selectedFiles) {
+      formData.append(file.name, file); // use file.name as the key
+  }
+
+  try {
+      const response = await fetch('/api/v1/image/uploadImage/', { 
+          method: 'POST',
+          headers: {
+              Authorization: `Bearer ${currUser?.data?.token}`, 
+          },
+          body: formData
+      });
+
+      if (!response.ok) throw new Error('Failed to upload images');
+      const { data } = await response.json();
+      console.log(data);
+      return data.urls; 
+  } catch (error) {
+      console.error('Error uploading images:', error);
+      return [];
+  }
+};
 const handleUpdate = (car) => {
     setFormData({ ...car,
         availableFrom: car.availableFrom.slice(0, 10),
@@ -73,29 +103,46 @@ const handleUpdate = (car) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(formData);
-    const endpoint = formData._id ? `/api/v1/cars/updateCarListings/${formData._id}` : '/api/v1/cars/createCarListings';
-        const method = formData._id ? 'PATCH' : 'POST';
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        try {
-            const response = await fetch(endpoint, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${currUser?.data?.token}`
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to save the car listing');
-            }
+  // Temporarily hold the current form data
+  let currentFormData = { ...formData };
 
+  // Upload images first if any are selected
+  if (selectedFiles.length > 0) {
+    try {
+      const imageUrls = await uploadImages(); 
+      // Update current form data with image URLs
+      currentFormData.image_url = imageUrls;
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      return; // Exit if image upload fails
+    }
+  }
 
-      const createdListing = await response.json();
-      console.log("Listing created:", createdListing);
+  console.log(currentFormData);
+
+  const endpoint = currentFormData._id ? `/api/v1/cars/updateCarListings/${currentFormData._id}` : '/api/v1/cars/createCarListings';
+  const method = currentFormData._id ? 'PATCH' : 'POST';
+
+  try {
+    const response = await fetch(endpoint, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${currUser?.data?.token}`
+      },
+      body: JSON.stringify(currentFormData) // Use updated form data
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to save the car listing');
+    }
+
+    const createdListing = await response.json();
+    console.log("Listing created:", createdListing);
+
 
       // Reset the form data
       setFormData({
@@ -291,6 +338,17 @@ const handleUpdate = (car) => {
               }
             />
           </div>
+          <div className="flex flex-col font-semibold">
+                    <label htmlFor="images">Car Images</label>
+                    <input
+                        type="file"
+                        name="images"
+                        id="images"
+                        onChange={handleFileChange}
+                        multiple // Allow multiple file selection
+                        className="input-field w-full"
+                    />
+                </div>
           <div className="flex justify-center font-semibold">
             <button
               type="submit"
