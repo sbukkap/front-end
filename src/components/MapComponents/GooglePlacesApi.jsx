@@ -64,14 +64,15 @@ const SearchLocationInput = ({ onChangeLocation }) => {
   }, []);
 
   return (
-    <div className="search-location-input">
+    <div className="search-location-input shadow-md">
       <label>Type in your suburb or postcode</label>
       <input
         ref={autoCompleteRef}
-        className="form-control"
+        className="form-control input-field w-full appearance-none bg-transparent text-gray-700 py-1 px-2 leading-tight focus:outline-none border-2 border-gray-300"
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search Places ..."
         value={query}
+        
       />
     </div>
   );
