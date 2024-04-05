@@ -1,17 +1,34 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaSearch } from "react-icons/fa";
 import logo from "../../assets/logo-png.png";
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
+import {
+  signOutUserStart,deleteUserSuccess,deleteUserFailure
+} from "../redux/user/userSlice";
 export const Navbar = () => {
   const [menuDraw, setMenuDraw] = useState(false);
   const { currUser } = useSelector((state) => state.user_mod);
-  
+  const dispatchAction = useDispatch();
+
+  const handleSignOut = async () => {
+    try {
+      dispatchAction(signOutUserStart());
+      const res = await fetch("/api/v1/auth/signout");
+      const data = await res.json();
+      if (data.success === false) {
+        dispatchAction(deleteUserFailure(data.message));
+        return;
+      }
+      dispatchAction(deleteUserSuccess(data));
+    } catch (error) {
+      dispatchAction(deleteUserFailure(data.message));
+    }
+  };
+
   // const [searchQuery, setSearchQuery] = useState("");
   // const handleSearch = async () => {
   //   console.log(searchQuery)
-  
+
   //   if (searchQuery.trim() !== "") {
   //     try {
   //       const response = await fetch(`/api/v1/cars/searchCars?query=${searchQuery.trim()}`, {
@@ -21,11 +38,11 @@ export const Navbar = () => {
   //           Authorization: `Bearer ${currUser?.data?.token}`
   //         }
   //       });
-  
+
   //       if (!response.ok) {
   //         throw new Error("Network response was not ok");
   //       }
-  
+
   //       const data = await response.json();
   //       setCars(data.data);
   //     } catch (error) {
@@ -36,7 +53,6 @@ export const Navbar = () => {
   //     }
   //   }
   // };
-  
 
   return (
     <nav className="navbar flex items-center justify-between px-10 py-4 bg-floralwhite">
@@ -112,11 +128,22 @@ export const Navbar = () => {
               View Listings
             </Link>
           </li>
-          <li>
+          {currUser?.data?.username?  (
+             <li>
+             <button
+               onClick={handleSignOut}
+               className="md:ml-4 text-lg font-bold"
+             >
+               Sign Out
+             </button>
+           </li>
+          ) : (
+            <li>
             <Link to="/sign-up" className="md:ml-4 text-lg font-bold">
               Register
             </Link>
           </li>
+          )}
         </ul>
       </div>
     </nav>
