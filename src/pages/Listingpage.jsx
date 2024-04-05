@@ -40,7 +40,7 @@ export const ListingCard = ({ car }) => {
       <li className="mb-1 font-serif">Available From: {formattedAvailableFrom}</li>
       <li className="mb-1 font-serif">Available To: {formattedAvailableTo}</li>
       <li className="mb-1 font-serif">
-        <Link to={`/itemLocation?lat=${car.location.lat}&lng=${gitcar.location.lng}`} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <Link to={`/itemLocation?lat=${car.location.lat}&lng=${car.location.lng}`} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           View item location
         </Link>
         <Link
