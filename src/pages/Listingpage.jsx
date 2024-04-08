@@ -12,7 +12,7 @@ function formatDate(isoString) {
   });
 }
 
-export const ListingCard = ({ car }) => {
+export const ListingCard = ({ car, handleAddToCart, isButtonClicked }) => {
 
   const placeholderImage = "../../assets/car2.jpg";
   const formattedAvailableFrom = formatDate(car.availableFrom);
@@ -40,7 +40,7 @@ export const ListingCard = ({ car }) => {
       <li className="mb-1 font-serif">Available From: {formattedAvailableFrom}</li>
       <li className="mb-1 font-serif">Available To: {formattedAvailableTo}</li>
       <li className="mb-1 font-serif">
-        <Link to={`/itemLocation?lat=${car.location.lat}&lng=${gitcar.location.lng}`} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <Link to={`/itemLocation?lat=${car.location.lat}&lng=${car.location.lng}`} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           View item location
         </Link>
         <Link
@@ -50,9 +50,14 @@ export const ListingCard = ({ car }) => {
             View Details
           </Link>
       </li>
-      <li className="mb-1 font-serif">Add to cart</li>
+      <li>
+      {/* disabled = {isButtonClicked} */}
+      <button onClick={() => handleAddToCart(car)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline">
+        Add to Cart
+      </button>
+      </li>
     </ul>
-  </div>
+  </div>  
 </div>
 
   );
@@ -87,8 +92,9 @@ const FilterDropdown = ({ label, options, selectedOption, onChange }) => {
   
 // };
 
-export default function Listingpage() {
+export default function Listingpage(props) {
   // Initialize state with empty array or example data if you want to show something initially
+
   const [cars, setCars] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
   const [error, setError] = useState(null);
@@ -214,13 +220,6 @@ export default function Listingpage() {
       }));
     }
   };
-  
-  // const handleFilterChange = (name, value) => {
-  //   setFilters(prevFilters => ({
-  //     ...prevFilters,
-  //     [name]: value,
-  //   }));
-  // };
 
 return (
   <main className="container mx-auto p-4 justify-center">
@@ -244,6 +243,16 @@ return (
       AVAILABLE CARS FOR RENT
     </h1>
 
+    {/* <button onClick={() => handleViewCart()} className="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline" style={{ left: "1555px", top: "125px", position: "absolute" }}>
+        View Cart
+      </button> */}
+
+    <Link
+      to={`/Cart`}
+      className="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
+    >
+      View Cart
+    </Link>
 
     <div className="absolute top-50">
     <FilterDropdown
@@ -304,29 +313,6 @@ return (
         onChange={(value) => handleFilterChange("minPricePerDay-maxPricePerDay", value)}
       />
       </div>
-
-      {/* <label htmlFor="fuelType">Fuel Type:</label>
-      <select id="fuelType" name="fuelType" onChange={handleFilterChange}>
-        <option value="">Select Fuel Type</option>
-        <option value="petrol">Petrol</option>
-        <option value="diesel">Diesel</option>
-        <option value="electric">Electric</option>
-      </select> */}
-
-      {/* <label htmlFor="minSeats">Min Seats:</label>
-      <input type="number" id="minSeats" name="minSeats" onChange={handleFilterChange} />
-      <label htmlFor="maxSeats">Max Seats:</label>
-      <input type="number" id="maxSeats" name="maxSeats" onChange={handleFilterChange} />
-
-      <label htmlFor="minPricePerDay">Min Price Per Day:</label>
-      <input type="number" id="minPricePerDay" name="minPricePerDay" onChange={handleFilterChange} />
-      <label htmlFor="maxPricePerDay">Max Price Per Day:</label>
-      <input type="number" id="maxPricePerDay" name="maxPricePerDay" onChange={handleFilterChange} />
-
-      <label htmlFor="availableFrom">Available From:</label>
-      <input type="date" id="availableFrom" name="availableFrom" onChange={handleFilterChange} />
-      <label htmlFor="availableTo">Available To:</label>
-      <input type="date" id="availableTo" name="availableTo" onChange={handleFilterChange} /> */}
     
     <div className="text-center mb-4">
       {currUser ? (
@@ -350,7 +336,7 @@ return (
         <p className="mx-auto">Loading...</p>
       ) : cars.length > 0 ? (
         cars.map((car) => (
-            <ListingCard key={`${car.id}-${Math.random()}`} car={car} />
+            <ListingCard key={`${car.id}-${Math.random()}`} car={car} handleAddToCart={props.handleAddToCart} isButtonClicked={props.isAddedToCart} />
           ))
       ) : (
         <p className="mx-auto">No listings available.</p>
