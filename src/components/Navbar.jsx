@@ -71,19 +71,19 @@ export const Navbar = () => {
         <ul className="md:flex flex-col md:flex-row md:ml-auto md:mr-0 items-center">
           <li>
             <button className="md:ml-4 text-lg font-bold text-black bg-transparent border border-black rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
-              <Link to="/sign-up">Home</Link>
+              <Link to="/">Home</Link>
             </button>
           </li>
           {currUser?.data?.username === "admin" && (
             <li>
               <button className="md:ml-4 text-lg font-bold text-black bg-transparent border border-black rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
-                <Link to="/sign-up">Admin Page</Link>
+                <Link to="/admin">Admin Page</Link>
               </button>
             </li>
           )}
           <li>
             <button className="md:ml-4 text-lg font-bold text-black bg-transparent border border-black rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
-              <Link to="/sign-up">Browse</Link>
+              <Link to="/Listingpage">Browse</Link>
             </button>
           </li>
           {currUser?.data?.username ? (
