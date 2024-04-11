@@ -28,13 +28,15 @@ const stripePromise = loadStripe(
 function App() {
   const { currUser } = useSelector((state) => state.user_mod);
   const { clientSecret } = useSelector((state) => state.user_mod);
-  const [cartExists, setCartExists] = useState(false);
+  var cartExists = false;
   const [cartItems, setCartItems] = useState([]);
-  const userId = currUser?.data?.token;
+  const userId = currUser ? currUser.data.username : null;
   const [isAddedToCart, setIsAddedToCart] = useState(false);
+
 
   const checkCartExistence = async () => {
     try {
+      console.log(userId);
       const response = await fetch(`/api/v1/shoppingCart/isShoppingCartPresent/${userId}`, {
         method: 'GET',
         headers: {
@@ -43,8 +45,9 @@ function App() {
         },
       });
       const data = await response.json();
-      // console.log(data.data.shoppingCart);
-      setCartExists(data.data.shoppingCart);
+      if (data.data.shoppingCart === true){
+        cartExists = true;
+      }
       // console.log(cartExists)
     } catch (error) {
       console.error('Error checking shopping cart existence:', error);
@@ -137,7 +140,7 @@ const handleUpdateCartItem = async (newItem) => {
       if (response.ok) {
           const data = await response.json();
           setCartItems([data.data]); // Set the updated cartItems
-          // console.log([data.data])
+          console.log([data.data])
           alert('Item added to cart');
       } else {
           // Handle error
@@ -153,10 +156,10 @@ const handleUpdateCartItem = async (newItem) => {
     try {
       // Ensure cart existence is checked before proceeding
       await checkCartExistence(); // Wait for the result of checkCartExistence()
-      // console.log(cartExists)
-      if (!cartExists) {
-        // console.log('created new')
-        setCartExists(true);
+      console.log(cartExists)
+      if (cartExists === false) {
+        console.log('created new')
+        // setCartExists(true);
         const response = await fetch(`/api/v1/shoppingCart/createShoppingcart`, {
           method: 'POST',
           headers: {
@@ -182,7 +185,7 @@ const handleUpdateCartItem = async (newItem) => {
           throw new Error('Network response was not ok');
         }
       } else {
-        // console.log('existing')
+        console.log('cart exists')
         await fetchCartItems();        
         // const updatedItems = [...cartItems, item]; // Merge existing cart items with the new item
         // setCartItems(updatedItems);
@@ -221,7 +224,7 @@ const handleUpdateCartItem = async (newItem) => {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/Createlisting" element={<Createlisting />} />
           <Route path="/Listingpage" element={<Listingpage handleAddToCart={handleAddToCart} isAddedToCart={isAddedToCart} />} />
-          <Route path="/Cart" element={<Cart cartItems={cartItems} />} />
+          <Route path="/Cart" element={<Cart />} />
           <Route element={<PrivateRoute />}>
             <Route path="/modify-listing" element={<AdminRentalApprove />} />
           </Route>
