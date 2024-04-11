@@ -12,7 +12,7 @@ function formatDate(isoString) {
   });
 }
 
-export const ListingCard = ({ car, handleAddToCart, isButtonClicked }) => {
+export const ListingCard = ({ car }) => {
 
   const placeholderImage = "../../assets/car2.jpg";
   const formattedAvailableFrom = formatDate(car.availableFrom);
@@ -50,12 +50,7 @@ export const ListingCard = ({ car, handleAddToCart, isButtonClicked }) => {
             View Details
           </Link>
       </li>
-      <li>
-      {/* disabled = {isButtonClicked} */}
-      <button onClick={() => handleAddToCart(car)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline">
-        Add to Cart
-      </button>
-      </li>
+    
     </ul>
   </div>  
 </div>
@@ -242,17 +237,6 @@ return (
     <h1 className="text-3xl font-bold text-center mb-6">
       AVAILABLE CARS FOR RENT
     </h1>
-
-    {/* <button onClick={() => handleViewCart()} className="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline" style={{ left: "1555px", top: "125px", position: "absolute" }}>
-        View Cart
-      </button> */}
-
-    <Link
-      to={`/Cart`}
-      className="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
-    >
-      View Cart
-    </Link>
 
     <div className="absolute top-50">
     <FilterDropdown
