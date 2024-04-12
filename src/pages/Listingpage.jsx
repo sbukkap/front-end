@@ -88,9 +88,6 @@ const FilterDropdown = ({ label, options, selectedOption, onChange }) => {
   );
 };
 
-// const Filters = ({ onChange }) => {
-  
-// };
 
 export default function Listingpage(props) {
   // Initialize state with empty array or example data if you want to show something initially
@@ -243,13 +240,10 @@ return (
       AVAILABLE CARS FOR RENT
     </h1>
 
-    {/* <button onClick={() => handleViewCart()} className="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline" style={{ left: "1555px", top: "125px", position: "absolute" }}>
-        View Cart
-      </button> */}
-
     <Link
       to={`/Cart`}
       className="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
+      style={{ left: "1545px", top: "125px", position: "absolute" }}
     >
       View Cart
     </Link>
