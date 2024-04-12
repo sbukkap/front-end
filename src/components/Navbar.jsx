@@ -72,7 +72,6 @@ export const Navbar = () => {
           <li>
             <button className="md:ml-4 text-lg font-bold text-black bg-transparent border border-black rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
               <Link to="/">Home</Link>
-              <Link to="/">Home</Link>
             </button>
           </li>
           {currUser?.data?.username === "admin" && (
