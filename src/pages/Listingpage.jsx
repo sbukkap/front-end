@@ -330,7 +330,7 @@ return (
         <p className="mx-auto">Loading...</p>
       ) : cars.length > 0 ? (
         cars.map((car) => (
-            <ListingCard key={`${car.id}-${Math.random()}`} car={car} handleAddToCart={props.handleAddToCart} isButtonClicked={props.isAddedToCart} />
+            <ListingCard key={`${car.id}-${Math.random()}`} car={car} handleAddToCart={props.handleAddToCart} />
           ))
       ) : (
         <p className="mx-auto">No listings available.</p>
