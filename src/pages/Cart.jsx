@@ -131,7 +131,6 @@ const Cart = () => {
             key={item._id} // Use the item._id as a unique key
             car={item} // Pass the item as the car prop
             handleAddToCart={handleDeleteFromCart} // Pass the delete function as handleAddToCart for now
-            isButtonClicked={false} // Use this prop if you have logic for disabling the Add to Cart button
           />
           {/* Add a delete button to allow deleting items from the cart */}
           <button

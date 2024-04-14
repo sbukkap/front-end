@@ -12,7 +12,7 @@ function formatDate(isoString) {
   });
 }
 
-export const ListingCard = ({ car }) => {
+export const ListingCard = ({ car, handleAddToCart }) => {
 
   const placeholderImage = "../../assets/car2.jpg";
   const formattedAvailableFrom = formatDate(car.availableFrom);
@@ -49,6 +49,10 @@ export const ListingCard = ({ car }) => {
           >
             View Details
           </Link>
+      <button onClick={() => handleAddToCart(car)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline">
+        Add to Cart
+      </button>
+        
       </li>
     
     </ul>
