@@ -5,7 +5,6 @@ import {
   signInSuccess,
   beginingSignin,
   FailedSign,
-  setClientSecret
 } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 import "react-toastify/dist/ReactToastify.css";
@@ -48,6 +47,7 @@ export default function SignUp() {
         return;
       } else if (data.status_code === 200) {
         dispatchAction(signInSuccess(data));
+        navigator("/")
       }
     } catch (err) {
       dispatchAction(FailedSign(err.message));
