@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useSelector,useDispatch } from "react-redux";
-import { Rating } from '@mui/material';
-import {
-  setClientSecret
-} from "../redux/user/userSlice";
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Rating } from "@mui/material";
+import { setClientSecret } from "../redux/user/userSlice";
 
 function CarDetailsPage() {
   const { currUser } = useSelector((state) => state.user_mod);
   const { carId } = useParams();
   const [carDetails, setCarDetails] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [reviewFormData, setReviewFormData] = useState({ rating: '', review: '' });
+  const [reviewFormData, setReviewFormData] = useState({
+    rating: "",
+    review: "",
+  });
   const [rating, setRating] = useState(0);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rentalDays, setRentalDays] = useState(1);
@@ -24,18 +25,21 @@ function CarDetailsPage() {
     const fetchCarDetails = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/v1/cars/getSingleCarListings/${carId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${currUser?.data?.token}`
+        const response = await fetch(
+          `/api/v1/cars/getSingleCarListings/${carId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${currUser?.data?.token}`,
+            },
           }
-        });
+        );
         if (!response.ok) {
-          throw new Error('Could not fetch car details');
+          throw new Error("Could not fetch car details");
         }
         const data = await response.json();
         setCarDetails(data.data);
-        setSelectedImage(data.data.image_url[0]); 
+        setSelectedImage(data.data.image_url[0]);
         fetchReviews();
       } catch (error) {
         setError(error.message);
@@ -46,14 +50,17 @@ function CarDetailsPage() {
 
     const fetchReviews = async () => {
       try {
-        const response = await fetch(`/api/v1/reviews/getallCarReviews/${carId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${currUser?.data?.token}`
+        const response = await fetch(
+          `/api/v1/reviews/getallCarReviews/${carId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${currUser?.data?.token}`,
+            },
           }
-        });
+        );
         if (!response.ok) {
-          throw new Error('Could not fetch reviews');
+          throw new Error("Could not fetch reviews");
         }
         const reviewData = await response.json();
         setReviews(reviewData.data);
@@ -68,15 +75,15 @@ function CarDetailsPage() {
   const postReview = async (reviewData) => {
     try {
       const response = await fetch(`/api/v1/reviews/createReview`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${currUser?.data?.token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
         },
-        body: JSON.stringify(reviewData)
+        body: JSON.stringify(reviewData),
       });
       if (!response.ok) {
-        throw new Error('Failed to post review');
+        throw new Error("Failed to post review");
       }
       fetchReviews();
     } catch (error) {
@@ -95,18 +102,27 @@ function CarDetailsPage() {
   const handlePayment = async () => {
     if (currUser && currUser.data && currUser.data.token) {
       try {
-        const stripeRes = await fetch("http://localhost:5173/api/v1/rent/stripePayment", {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${currUser.data.token}` 
-          },
-          body: JSON.stringify({ items: { duration:rentalDays, cost: carDetails.pricePerDay, id: carDetails._id  } }),
-        });
+        const stripeRes = await fetch(
+          "http://localhost:5173/api/v1/rent/stripePayment",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${currUser.data.token}`,
+            },
+            body: JSON.stringify({
+              items: {
+                duration: rentalDays,
+                cost: carDetails.pricePerDay,
+                id: carDetails._id,
+              },
+            }),
+          }
+        );
         if (!stripeRes.ok) {
           throw new Error(`Failed to fetch client secret: ${stripeRes.status}`);
         }
-        
+
         const stripeData = await stripeRes.json();
         console.log("stripeData", stripeData.data.clientSecret);
         dispatchAction(setClientSecret(stripeData.data.clientSecret));
@@ -121,13 +137,13 @@ function CarDetailsPage() {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     const dataToSubmit = {
-      ratings: rating, 
+      ratings: rating,
       review: reviewFormData.review,
       item_id: carId,
     };
 
     await postReview(dataToSubmit);
-    setReviewFormData({ rating: '', review: '' });
+    setReviewFormData({ rating: "", review: "" });
   };
 
   if (isLoading) {
@@ -135,11 +151,19 @@ function CarDetailsPage() {
   }
 
   if (error) {
-    return <div className="text-center text-xl text-red-500 mt-10">Error: {error}</div>;
+    return (
+      <div className="text-center text-xl text-red-500 mt-10">
+        Error: {error}
+      </div>
+    );
   }
 
   if (!carDetails) {
-    return <div className="text-center text-xl text-gray-500 mt-10">Car not found</div>;
+    return (
+      <div className="text-center text-xl text-gray-500 mt-10">
+        Car not found
+      </div>
+    );
   }
 
   const mapLink = `/itemLocation?lat=${carDetails.location.lat}&lng=${carDetails.location.lng}`;
@@ -149,10 +173,16 @@ function CarDetailsPage() {
     <div className="min-h-screen bg-customcolor-100 py-10">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between mb-6">
-          <Link to={backLink} className="text-blue-600 hover:text-blue-700 py-2 px-8 transition duration-300">
+          <Link
+            to={backLink}
+            className="text-blue-600 hover:text-blue-700 py-2 px-8 transition duration-300"
+          >
             ← Go back
           </Link>
-          <Link to={mapLink} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full transition ease-in-out duration-300">
+          <Link
+            to={mapLink}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full transition ease-in-out duration-300"
+          >
             View on Map
           </Link>
         </div>
@@ -176,7 +206,7 @@ function CarDetailsPage() {
                       className="inline-block object-cover rounded-lg cursor-pointer p-1 border-2 border-transparent hover:border-blue-500"
                       src={image}
                       alt={`Thumbnail ${index}`}
-                      style={{ width: '100px', height: '75px' }}
+                      style={{ width: "100px", height: "75px" }}
                     />
                   ))}
                 </div>
@@ -187,7 +217,10 @@ function CarDetailsPage() {
               <h6 className="text-lg font-semibold mb-4">Reviews</h6>
               {reviews.length > 0 ? (
                 reviews.map((review) => (
-                  <div key={review._id} className="border-b border-gray-200 mb-4 pb-4">
+                  <div
+                    key={review._id}
+                    className="border-b border-gray-200 mb-4 pb-4"
+                  >
                     <Rating name="read-only" value={review.ratings} readOnly />
                     <p className="text-gray-800 mt-2">{review.review}</p>
                   </div>
@@ -201,29 +234,53 @@ function CarDetailsPage() {
           <div className="md:w-1/3 px-4">
             {/* Car Details */}
             <div className="bg-white shadow rounded-lg p-4 mb-6">
-              <h5 className="text-xl font-semibold mb-2">{carDetails.carMake} {carDetails.carModel}</h5>
+              <h5 className="text-xl font-semibold mb-2">
+                {carDetails.carMake} {carDetails.carModel}
+              </h5>
               <dl>
-                <p><strong>Year:</strong> {carDetails.year}</p>
-                <p><strong>Mileage:</strong> {carDetails.mileage}</p>
-                <p><strong>Transmission:</strong> {carDetails.transmission}</p>
-                <p><strong>Fuel Type:</strong> {carDetails.fuelType}</p>
-                <p><strong>Seats:</strong> {carDetails.seats}</p>
-                <p><strong>Price Per Day:</strong> {carDetails.pricePerDay}</p>
-                <p><strong>Available From:</strong> {new Date(carDetails.availableFrom).toLocaleDateString()}</p>
-                <p><strong>Available To:</strong> {new Date(carDetails.availableTo).toLocaleDateString()}</p>
-                <dl>
-                {/* Existing car details... */}
-                <p><strong>Rental Days:</strong>
-                  <input
-                    type="number"
-                    value={rentalDays}
-                    onChange={(e) => setRentalDays(e.target.value)}
-                    className="ml-2 w-20 border border-gray-300 rounded p-1"
-                    min="1"
-                  />
+                <p>
+                  <strong>Year:</strong> {carDetails.year}
                 </p>
-                <p><strong>Total Cost:</strong> ${carDetails.pricePerDay * rentalDays}</p>
-              </dl>
+                <p>
+                  <strong>Mileage:</strong> {carDetails.mileage}
+                </p>
+                <p>
+                  <strong>Transmission:</strong> {carDetails.transmission}
+                </p>
+                <p>
+                  <strong>Fuel Type:</strong> {carDetails.fuelType}
+                </p>
+                <p>
+                  <strong>Seats:</strong> {carDetails.seats}
+                </p>
+                <p>
+                  <strong>Price Per Day:</strong> {carDetails.pricePerDay}
+                </p>
+                <p>
+                  <strong>Available From:</strong>{" "}
+                  {new Date(carDetails.availableFrom).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Available To:</strong>{" "}
+                  {new Date(carDetails.availableTo).toLocaleDateString()}
+                </p>
+                <dl>
+                  {/* Existing car details... */}
+                  <p>
+                    <strong>Rental Days:</strong>
+                    <input
+                      type="number"
+                      value={rentalDays}
+                      onChange={(e) => setRentalDays(e.target.value)}
+                      className="ml-2 w-20 border border-gray-300 rounded p-1"
+                      min="1"
+                    />
+                  </p>
+                  <p>
+                    <strong>Total Cost:</strong> $
+                    {carDetails.pricePerDay * rentalDays}
+                  </p>
+                </dl>
               </dl>
             </div>
             {/* Review Form */}
@@ -236,7 +293,10 @@ function CarDetailsPage() {
                     value={rating}
                     onChange={(event, newValue) => {
                       setRating(newValue);
-                      setReviewFormData({ ...reviewFormData, rating: newValue });
+                      setReviewFormData({
+                        ...reviewFormData,
+                        rating: newValue,
+                      });
                     }}
                   />
                 </div>
@@ -262,12 +322,12 @@ function CarDetailsPage() {
                 </div>
               </form>
             </div>
-            <div className="text-right mt-4">
+            <div className="text-right mt-4" style={{ paddingTop: "70px" }}>
               <button
                 onClick={handlePayment}
                 className="rounded bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 transition-colors duration-300"
               >
-                Make Payment
+                Proceed to Payment
               </button>
             </div>
           </div>

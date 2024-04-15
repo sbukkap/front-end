@@ -15,8 +15,14 @@ import CarDetailsPage from "./pages/CarDetailsPage";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./pages/Payment/CheckoutForm";
+import { useDispatch, useSelector } from "react-redux";
+import { update } from "firebase/database";
+import { arrayUnion } from "firebase/firestore";
 import Cart from "./pages/Cart";
+import PaymentSucess from "./components/Payment/PaymentSuccess";
+import PaymentFailure from "./components/Payment/PaymentFailure";
 import useCart from "./hooks/useCart";
+
 
 const stripePromise = loadStripe(
   "pk_test_51Oy4XrKDZmp8eDSbYQN6Fam0JxugYee73NJNswgl4U5QrS20yiYAYDseStP3Orj0YnIMFjWWMwWX3r5i0qBE1wVX00FJbX1o30"
@@ -47,6 +53,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/Createlisting" element={<Createlisting />} />
           <Route path="/Listingpage" element={<Listingpage handleAddToCart={handleAddToCart} />} />
+          <Route path="/paymentSuccess" element={<PaymentSucess/>} />
+          <Route path="/paymentFailure" element={<PaymentFailure/>} />
           <Route path="/Cart" element={<Cart cartItems={cartItems} />} />
           <Route element={<PrivateRoute />}>
             <Route path="/modify-listing" element={<AdminRentalApprove />} />
@@ -54,7 +62,7 @@ function App() {
           <Route path="/itemLocation" element={<ItemLocation />} />
           <Route path="/carDetails/:carId" element={<CarDetailsPage />} />
           {clientSecret && (
-            <Route
+            <Route 
               path="/checkout"
               element={
                 <Elements options={options} stripe={stripePromise}>

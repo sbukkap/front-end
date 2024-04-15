@@ -57,7 +57,24 @@ const Cart = () => {
       // Check if the response is successful
       if (response.ok) {
         // Update the cartItems state to remove the deleted item
-        setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
+        // setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
+
+        // setCartItems((prevItems) => {
+        //   // console.log(prevItems[0].items.filter((item) => item._id !== itemId))
+        //   return prevItems[0].items.filter((item) => item._id !== itemId)
+        // });
+
+        setCartItems((prevItems) => {
+          // Create a copy of the current cartItems state
+          const updatedCart = { ...prevItems[0] };
+          
+          // Filter the items array to remove the item with the specified ID
+          updatedCart.items = updatedCart.items.filter((item) => item._id !== itemId);
+  
+          // Return the updated cart as an array with one element (to maintain original structure)
+          return [updatedCart];
+        });
+
         alert('Item deleted successfully!');
       } else {
         // Handle error case
@@ -70,21 +87,6 @@ const Cart = () => {
     }
   };
   
-  
-  // return (
-  //   <div>
-  //     <h2>Shopping Cart</h2>
-  //     {cartItems && cartItems[0] && cartItems[0].items.map(item => (
-  //       <div key={item._id}>
-  //         <p>{`${item.carMake} ${item.carModel}`} - ${item.pricePerDay}</p>
-  //         <button onClick={() => handleDeleteFromCart(item._id)}>Delete</button>
-  //       </div>
-  //     ))}
-  //     <p>Total Price: ${totalPrice}</p>
-  //     <button>Proceed to Payment</button>
-  //   </div>
-  // );
-
   // return (
   //   <div>
   //     <h2>Shopping Cart</h2>
@@ -130,7 +132,6 @@ const Cart = () => {
           <ListingCard
             key={item._id} // Use the item._id as a unique key
             car={item} // Pass the item as the car prop
-            handleAddToCart={handleDeleteFromCart} // Pass the delete function as handleAddToCart for now
           />
           {/* Add a delete button to allow deleting items from the cart */}
           <button
