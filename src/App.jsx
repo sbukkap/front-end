@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -15,10 +15,9 @@ import CarDetailsPage from "./pages/CarDetailsPage";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./pages/Payment/CheckoutForm";
-import { useDispatch, useSelector } from "react-redux";
-import { update } from "firebase/database";
-import { arrayUnion } from "firebase/firestore";
-import Cart from "./pages/Cart";
+import {  useSelector } from "react-redux";
+import PaymentSucess from "./components/Payment/PaymentSuccess";
+import PaymentFailure from "./components/Payment/PaymentFailure";
 
 
 const stripePromise = loadStripe(
@@ -53,13 +52,15 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/Createlisting" element={<Createlisting />} />
           <Route path="/Listingpage" element={<Listingpage/>} />
+          <Route path="/paymentSuccess" element={<PaymentSucess/>} />
+          <Route path="/paymentFailure" element={<PaymentFailure/>} />
           <Route element={<PrivateRoute />}>
             <Route path="/modify-listing" element={<AdminRentalApprove />} />
           </Route>
           <Route path="/itemLocation" element={<ItemLocation />} />
           <Route path="/carDetails/:carId" element={<CarDetailsPage />} />
           {clientSecret && (
-            <Route
+            <Route 
               path="/checkout"
               element={
                 <Elements options={options} stripe={stripePromise}>
