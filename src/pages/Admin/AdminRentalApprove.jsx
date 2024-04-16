@@ -6,6 +6,9 @@ import ComplaintListingCard from "../../components/ComplaintListingCard";
 export default function CRUDListings() {
   const [carsForApproval, setCarsForApproval] = useState([]);
   const [complaintsFiled, setComplaintsFiled] = useState([]);
+  const [mostComplainedCustomer, setMostComplainedCustomer] = useState({});
+  const [mostComplainedOwner, setMostComplainedOwner] = useState({});
+  const [mostRentedItem, setMostRentedItem] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { currUser } = useSelector((state) => state.user_mod);
@@ -43,11 +46,26 @@ export default function CRUDListings() {
             },
           }
         );
-        if (!complaintsResponse.ok) {
+        const customerComplaintResponse = await fetch("/api/v1/ticketingSystem/adminCustomerWithMostComplaints", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${currUser?.data?.token}` },
+        });
+        const ownerComplaintResponse = await fetch("/api/v1/ticketingSystem/adminCustomerWithMostComplaints", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${currUser?.data?.token}` },
+        });
+        const mostRentedResponse = await fetch("/api/v1/rent/mostRentedItem", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${currUser?.data?.token}` },
+        });
+        if (!complaintsResponse.ok || !customerComplaintResponse.ok || !ownerComplaintResponse.ok || !mostRentedResponse.ok) {
           throw new Error("Network response was not ok");
         }
         const complaintsData = await complaintsResponse.json();
+        const customerComplaintData = await customerComplaintResponse.json();
+        const ownerComplaintData = await ownerComplaintResponse.json();
+        const mostRentedData = await mostRentedResponse.json();
         setComplaintsFiled(complaintsData.data);
+        setMostComplainedCustomer(customerComplaintData.data);
+        setMostComplainedOwner(ownerComplaintData.data);
+        setMostRentedItem(mostRentedData.data);
         console.log("complaints", complaintsData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -155,7 +173,7 @@ export default function CRUDListings() {
         );
       }
 
-      // Functional update to remove the deleted item from the state
+
       setComplaintsFiled((currentComplaints) =>
         currentComplaints.filter((comment) => comment._id !== commentId)
       );
@@ -164,55 +182,189 @@ export default function CRUDListings() {
     }
   };
 
+  const CustomerComplaintCard = ({ customer }) => {
+    if (!customer) return <p className="text-center">No data available.</p>;
+    return (
+      <div className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-all">
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">Customer with Most Complaints</h3>
+        <p><strong>Username:</strong> {customer.username}</p>
+        <p><strong>Email:</strong> {customer.email}</p>
+        <p><strong>Complaints:</strong> {customer.complaint_frequency}</p>
+      </div>
+    );
+  };
+
+  const OwnerComplaintCard = ({ owner }) => {
+    if (!owner) return <p className="text-center">No data available.</p>;
+    return (
+      <div className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-all">
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">Owner with Most Complaints</h3>
+        <p><strong>Username:</strong> {owner.username}</p>
+        <p><strong>Email:</strong> {owner.email}</p>
+        <p><strong>Complaints:</strong> {owner.complaint_frequency}</p>
+      </div>
+    );
+  };
+
+  const RentalInfoCard = ({ item }) => {
+    if (!item) return <p className="text-center">No data available.</p>;
+    return (
+      <div className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-all">
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">Most Rented Item</h3>
+        {item.itemdetails ? (
+          <>
+            <p><strong> Car Id:</strong> {item.itemdetails._id}</p>
+            <p><strong>Make:</strong> {item.itemdetails.carMake}</p>
+            <p><strong>Model:</strong> {item.itemdetails.carModel}</p>
+            <p><strong>Year:</strong> {item.itemdetails.year}</p>
+            <p><strong>Mileage:</strong> {item.itemdetails.mileage}</p>
+            <p><strong>Transmission:</strong> {item.itemdetails.transmission}</p>
+            <p><strong>Fuel Type:</strong> {item.itemdetails.fuelType}</p>
+            <p><strong>Rental Count:</strong> {item.item_frequency}</p>
+          </>
+        ) : (
+          <p>Details not available.</p>
+        )}
+      </div>
+    );
+  };
+
+
+
   return (
-    <main className="container mx-auto p-4">
+    <main className="container mx-auto px-4 py-8">
       {currUser?.data?.username === "admin" && (
         <>
-          <section className="mb-8">
-            <h1 className="text-3xl font-bold text-center mb-6">
-              AVAILABLE CARS FOR APPROVAL
+          <div className="min-w-full overflow-hidden overflow-x-auto align-middle shadow sm:rounded-lg mb-8">
+            <h1 className="text-3xl font-bold text-center mb-8">
+              Dashboard Overview
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Name/ID
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Details
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Count
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Customer with Most Complaints
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostComplainedCustomer.username}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostComplainedCustomer.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostComplainedCustomer.complaint_frequency}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Owner with Most Complaints
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostComplainedOwner.username}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostComplainedOwner.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostComplainedOwner.complaint_frequency}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Most Rented Item
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostRentedItem.itemdetails?.carMake ?? 'N/A'} {mostRentedItem.itemdetails?.carModel ?? ''}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    Year: {mostRentedItem.itemdetails?.year ?? 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {mostRentedItem.item_frequency ?? 'N/A'}
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <section className="mb-12">
+
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <CustomerComplaintCard customer={mostComplainedCustomer} />
+              <OwnerComplaintCard owner={mostComplainedOwner} />
+              <RentalInfoCard item={mostRentedItem} />
+            </div>
+          </section>
+
+          <section className="mb-12">
+            <h1 className="text-3xl font-bold text-center mb-8">
+              Available Cars for Approval
+            </h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {isLoading ? (
-                <p className="mx-auto">Loading...</p>
+                <p className="text-center col-span-full">Loading...</p>
               ) : carsForApproval.length > 0 ? (
-                carsForApproval.map((car, index) => (
+                carsForApproval.map((car) => (
                   <AdminListingCard
-                    key={`${car.id}-${Math.random()}`}
+                    key={car._id}
                     car={car}
                     onApproval={() => handleRentalApproval(car._id)}
                     onDenial={() => handleRentalDeny(car._id)}
                   />
                 ))
               ) : (
-                <p className="mx-auto">No available cars for approval.</p>
+                <p className="text-center col-span-full">No available cars for approval.</p>
               )}
             </div>
           </section>
 
-          <section>
-            <h1 className="text-3xl font-bold text-center mb-6">
-              COMPLAINTS FILED
+          <section className="mb-12">
+            <h1 className="text-3xl font-bold text-center mb-8">
+              Complaints Filed
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {isLoading ? (
-                <p className="mx-auto">Loading...</p>
+                <p className="text-center col-span-full">Loading...</p>
               ) : complaintsFiled.length > 0 ? (
-                complaintsFiled.map((complaint, index) => (
+                complaintsFiled.map((complaint) => (
                   <ComplaintListingCard
-                    key={`${complaint.id}-${Math.random()}`}
+                    key={complaint._id}
                     complaint={complaint}
                     onApproval={() => handleComplaintApprove(complaint._id)}
                     onDenial={() => handleComplaintDeny(complaint._id)}
                   />
                 ))
               ) : (
-                <p className="mx-auto">No complaints filed.</p>
+                <p className="text-center col-span-full">No complaints filed.</p>
               )}
             </div>
           </section>
+
+
+
         </>
       )}
     </main>
   );
+
 }
