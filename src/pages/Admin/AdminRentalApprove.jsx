@@ -1,43 +1,66 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import AdminListingCard from "../../components/AdminListingCard";
+import ComplaintListingCard from "../../components/ComplaintListingCard";
 
 export default function CRUDListings() {
-  // Initialize state with empty array or example data if you want to show something initially
-  const [cars, setCars] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // State to track loading status
+  const [carsForApproval, setCarsForApproval] = useState([]);
+  const [complaintsFiled, setComplaintsFiled] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { currUser } = useSelector((state) => state.user_mod);
 
   useEffect(() => {
-    async function fetchListings() {
-      setIsLoading(true); // Begin loading
-      setError(null); // Reset error state
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
       try {
-        const response = await fetch("/api/v1/cars/getAllCarsListingsAdmin", {
-          method: "GET", // Method is optional if you are making a GET request, included here for clarity
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currUser?.data?.token}`, // Uncomment and replace if you need to send an authorization token
-          },
-        });
-        if (!response.ok) {
+        // Fetch available cars for approval
+        const approvalResponse = await fetch(
+          "/api/v1/cars/getAllCarsListingsAdmin",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${currUser?.data?.token}`,
+            },
+          }
+        );
+        if (!approvalResponse.ok) {
           throw new Error("Network response was not ok");
         }
-        const data = await response.json();
-        setCars(data.data);
+        const approvalData = await approvalResponse.json();
+        setCarsForApproval(approvalData.data);
+
+        // Fetch complaints filed
+        const complaintsResponse = await fetch(
+          "/api/v1/ticketingSystem/adminGetAllComplaints",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${currUser?.data?.token}`,
+            },
+          }
+        );
+        if (!complaintsResponse.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const complaintsData = await complaintsResponse.json();
+        setComplaintsFiled(complaintsData.data);
+        console.log("complaints", complaintsData);
       } catch (error) {
-        console.error("Error fetching listings:", error);
-        setError("Failed to fetch listings. Please try again later."); // Set error message
+        console.error("Error fetching data:", error);
+        setError("Failed to fetch data. Please try again later.");
       } finally {
-        setIsLoading(false); // End loading
+        setIsLoading(false);
       }
     }
 
-    fetchListings();
+    fetchData();
   }, []);
 
-  const handleApprove = async (carId) => {
+  const handleRentalApproval = async (carId) => {
     try {
       const response = await fetch(`/api/v1/cars/adminApprove/${carId}`, {
         method: "PATCH",
@@ -55,7 +78,7 @@ export default function CRUDListings() {
       }
 
       // Functional update to remove the deleted item from the state
-      setCars((currentCars) =>
+      setCarsForApproval((currentCars) =>
         currentCars.filter((car) => car._id !== carId)
       );
     } catch (error) {
@@ -63,7 +86,33 @@ export default function CRUDListings() {
     }
   };
 
-  const handleDeny = async (carId) => {
+  const handleComplaintApprove = async (commentId) => {
+    try {
+      const response = await fetch(`/api/v1/ticketingSystem/updateComplaintResolveStatus/${commentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to approve the car listing"
+        );
+      }
+
+      // Functional update to remove the deleted item from the state
+      setComplaintsFiled((currentComplaints) =>
+        currentComplaints.filter((comment) => comment._id !== commentId)
+      );
+    } catch (error) {
+      console.error("Error approving listing:", error);
+    }
+  };
+
+  const handleRentalDeny = async (carId) => {
     try {
       const response = await fetch(`/api/v1/cars/deleteCarListings/${carId}`, {
         method: "DELETE",
@@ -81,7 +130,7 @@ export default function CRUDListings() {
       }
 
       // Functional update to remove the deleted item from the state
-      setCars((currentCars) =>
+      setCarsForApproval((currentCars) =>
         currentCars.filter((car) => car._id !== carId)
       );
     } catch (error) {
@@ -89,33 +138,81 @@ export default function CRUDListings() {
     }
   };
 
+  const handleComplaintDeny = async (commentId) => {
+    try {
+      const response = await fetch(`/api/v1/ticketingSystem/deleteComplaint/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to delete the car listing"
+        );
+      }
+
+      // Functional update to remove the deleted item from the state
+      setComplaintsFiled((currentComplaints) =>
+        currentComplaints.filter((comment) => comment._id !== commentId)
+      );
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+    }
+  };
 
   return (
-    <main className="container mx-auto p-4 justify-center">
+    <main className="container mx-auto p-4">
       {currUser?.data?.username === "admin" && (
-        <h1 className="text-3xl font-bold text-center mb-6">
-          AVAILABLE CARS FOR APPROVAL
-        </h1>
+        <>
+          <section className="mb-8">
+            <h1 className="text-3xl font-bold text-center mb-6">
+              AVAILABLE CARS FOR APPROVAL
+            </h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {isLoading ? (
+                <p className="mx-auto">Loading...</p>
+              ) : carsForApproval.length > 0 ? (
+                carsForApproval.map((car, index) => (
+                  <AdminListingCard
+                    key={`${car.id}-${Math.random()}`}
+                    car={car}
+                    onApproval={() => handleRentalApproval(car._id)}
+                    onDenial={() => handleRentalDeny(car._id)}
+                  />
+                ))
+              ) : (
+                <p className="mx-auto">No available cars for approval.</p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h1 className="text-3xl font-bold text-center mb-6">
+              COMPLAINTS FILED
+            </h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {isLoading ? (
+                <p className="mx-auto">Loading...</p>
+              ) : complaintsFiled.length > 0 ? (
+                complaintsFiled.map((complaint, index) => (
+                  <ComplaintListingCard
+                    key={`${complaint.id}-${Math.random()}`}
+                    complaint={complaint}
+                    onApproval={() => handleComplaintApprove(complaint._id)}
+                    onDenial={() => handleComplaintDeny(complaint._id)}
+                  />
+                ))
+              ) : (
+                <p className="mx-auto">No complaints filed.</p>
+              )}
+            </div>
+          </section>
+        </>
       )}
-      <section className="flex flex-wrap -mx-4">
-        {isLoading ? (
-          <p className="mx-auto">Loading...</p>
-        ) : cars.length > 0 ? (
-          cars.map((car, index) => (
-            <React.Fragment key={`${car.id}-${Math.random()}`}>
-              <AdminListingCard
-                car={car}
-                onApproval={() => handleApprove(car._id)}
-                onDenial={() => handleDeny(car._id)}
-              />
-              {index < cars.length - 1 && <div style={{ width: '16px' }} />} {/* Adjust the width as needed */}
-            </React.Fragment>
-          ))
-        ) : (
-          <p className="mx-auto">No listings available.</p>
-        )}
-      </section>
     </main>
   );
-  
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from "react-redux";
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -8,6 +9,7 @@ const formatDate = (dateString) => {
 const RentedItemsCard = ({ car }) => {
   const [showComplaintPopup, setShowComplaintPopup] = useState(false);
   const [complaintText, setComplaintText] = useState('');
+  const { currUser } = useSelector((state) => state.user_mod);
 
   const availableFromDate = formatDate(car.availableFrom);
   const availableToDate = formatDate(car.availableTo);
@@ -16,10 +18,29 @@ const RentedItemsCard = ({ car }) => {
     setShowComplaintPopup(true);
   };
 
-  const handleComplaintSubmit = () => {
-    // Handle complaint submission here
-    // You can access the complaint text from the `complaintText` state
-    setShowComplaintPopup(false);
+  const handleComplaintSubmit = async () => {
+    try {
+      const res = await fetch("/api/v1/ticketingSystem/launchComplaint/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
+        },
+        body: JSON.stringify({
+          item: car._id,
+          comment: complaintText
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to submit complaint');
+      }
+      
+      setShowComplaintPopup(false);
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      // Handle error
+    }
   };
 
   const handleCancel = () => {
