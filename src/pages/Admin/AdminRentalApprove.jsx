@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import AdminListingCard from "../../components/AdminListingCard";
 import ComplaintListingCard from "../../components/ComplaintListingCard";
+import { nightStyles } from "../../constants/constants";
 
 export default function CRUDListings() {
   const [carsForApproval, setCarsForApproval] = useState([]);
@@ -12,9 +13,7 @@ export default function CRUDListings() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { currUser } = useSelector((state) => state.user_mod);
-  const nightStyles = {
-    backgroundImage: "linear-gradient(to bottom right, #403F44, #1E1B32)",
-  };
+  
 
   useEffect(() => {
     async function fetchData() {

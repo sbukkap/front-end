@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector} from "react-redux";
 import { Rating } from "@mui/material";
-
+import { nightStyles } from "../constants/constants";
 import { loadStripe } from "@stripe/stripe-js";
 
 
@@ -176,7 +176,7 @@ function CarDetailsPage() {
   const backLink = "/Listingpage";
 
   return (
-    <div className="min-h-screen bg-customcolor-100 py-10">
+    <div className="min-h-screen bg-customcolor-100 py-10" style={nightStyles}>
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between mb-6">
           <Link
