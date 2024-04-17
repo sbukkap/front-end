@@ -25,7 +25,7 @@ const stripePromise = loadStripe(
 );
 
 function App() {
-  const { currUser } = useSelector((state) => state.user_mod);
+  
   const { clientSecret } = useSelector((state) => state.user_mod);
   
 
