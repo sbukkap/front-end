@@ -235,11 +235,11 @@ export default function CRUDListings() {
 
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto px-4 py-8" style={nightStyles}>
       {currUser?.data?.username === "admin" && (
         <>
           <div className="min-w-full overflow-hidden overflow-x-auto align-middle shadow sm:rounded-lg mb-8">
-            <h1 className="text-3xl font-bold text-center mb-8">
+            <h1 className="text-3xl text-white font-bold text-center mb-8">
               Dashboard Overview
             </h1>
             <table className="min-w-full divide-y divide-gray-200">
@@ -320,7 +320,7 @@ export default function CRUDListings() {
           </section>
 
           <section className="mb-12">
-            <h1 className="text-3xl font-bold text-center mb-8">
+            <h1 className="text-3xl text-white font-bold text-center mb-8">
               Available Cars for Approval
             </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -336,13 +336,13 @@ export default function CRUDListings() {
                   />
                 ))
               ) : (
-                <p className="text-center col-span-full">No available cars for approval.</p>
+                <p className="text-center text-white col-span-full">No available cars for approval.</p>
               )}
             </div>
           </section>
 
           <section className="mb-12">
-            <h1 className="text-3xl font-bold text-center mb-8">
+            <h1 className="text-3xl text-white font-bold text-center mb-8">
               Complaints Filed
             </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -358,7 +358,7 @@ export default function CRUDListings() {
                   />
                 ))
               ) : (
-                <p className="text-center col-span-full">No complaints filed.</p>
+                <p className="text-center text-white col-span-full">No complaints filed.</p>
               )}
             </div>
           </section>
