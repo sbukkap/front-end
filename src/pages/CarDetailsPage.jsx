@@ -111,11 +111,9 @@ function CarDetailsPage() {
               Authorization: `Bearer ${currUser.data.token}`,
             },
             body: JSON.stringify({
-              items: {
                 duration: rentalDays,
                 cost: carDetails.pricePerDay,
-                id: carDetails._id,
-              },
+                item_id: carDetails._id,
             }),
           }
         );
