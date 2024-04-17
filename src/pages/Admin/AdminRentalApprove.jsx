@@ -9,6 +9,9 @@ export default function CRUDListings() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { currUser } = useSelector((state) => state.user_mod);
+  const nightStyles = {
+    backgroundImage: "linear-gradient(to bottom right, #403F44, #1E1B32)",
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -165,54 +168,53 @@ export default function CRUDListings() {
   };
 
   return (
-    <main className="container mx-auto p-4">
-      {currUser?.data?.username === "admin" && (
-        <>
-          <section className="mb-8">
-            <h1 className="text-3xl font-bold text-center mb-6">
-              AVAILABLE CARS FOR APPROVAL
-            </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {isLoading ? (
-                <p className="mx-auto">Loading...</p>
-              ) : carsForApproval.length > 0 ? (
-                carsForApproval.map((car, index) => (
-                  <AdminListingCard
-                    key={`${car.id}-${Math.random()}`}
-                    car={car}
-                    onApproval={() => handleRentalApproval(car._id)}
-                    onDenial={() => handleRentalDeny(car._id)}
-                  />
-                ))
-              ) : (
-                <p className="mx-auto">No available cars for approval.</p>
-              )}
-            </div>
-          </section>
-
-          <section>
-            <h1 className="text-3xl font-bold text-center mb-6">
-              COMPLAINTS FILED
-            </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {isLoading ? (
-                <p className="mx-auto">Loading...</p>
-              ) : complaintsFiled.length > 0 ? (
-                complaintsFiled.map((complaint, index) => (
-                  <ComplaintListingCard
-                    key={`${complaint.id}-${Math.random()}`}
-                    complaint={complaint}
-                    onApproval={() => handleComplaintApprove(complaint._id)}
-                    onDenial={() => handleComplaintDeny(complaint._id)}
-                  />
-                ))
-              ) : (
-                <p className="mx-auto">No complaints filed.</p>
-              )}
-            </div>
-          </section>
-        </>
-      )}
-    </main>
+    <main className="container mx-auto p-4" style={nightStyles}>
+    {currUser?.data?.username === "admin" && (
+      <>
+        <section className="mb-8">
+          <h1 className="text-3xl text-white font-bold text-center mb-10">
+            AVAILABLE CARS FOR APPROVAL
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {isLoading ? (
+              <p className="mx-auto">Loading...</p>
+            ) : carsForApproval.length > 0 ? (
+              carsForApproval.map((car, index) => (
+                <AdminListingCard
+                  key={`${car.id}-${Math.random()}`}
+                  car={car}
+                  onApproval={() => handleRentalApproval(car._id)}
+                  onDenial={() => handleRentalDeny(car._id)}
+                />
+              ))
+            ) : (
+              <p className="mx-auto text-white">No available cars for approval.</p>
+            )}
+          </div>
+        </section>
+  
+        <section>
+          <h1 className="text-3xl text-white font-bold text-center mb-10">COMPLAINTS FILED</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {isLoading ? (
+              <p className="mx-auto">Loading...</p>
+            ) : complaintsFiled.length > 0 ? (
+              complaintsFiled.map((complaint, index) => (
+                <ComplaintListingCard
+                  key={`${complaint.id}-${Math.random()}`}
+                  complaint={complaint}
+                  onApproval={() => handleComplaintApprove(complaint._id)}
+                  onDenial={() => handleComplaintDeny(complaint._id)}
+                />
+              ))
+            ) : (
+              <p className="mx-auto text-white">No complaints filed.</p>
+            )}
+          </div>
+        </section>
+      </>
+    )}
+  </main>
+  
   );
 }
