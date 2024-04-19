@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { useSelector} from "react-redux";
 import { Rating } from "@mui/material";
-import { setClientSecret } from "../redux/user/userSlice";
+import { nightStyles } from "../constants/constants";
+import { loadStripe } from "@stripe/stripe-js";
+
 
 function CarDetailsPage() {
   const { currUser } = useSelector((state) => state.user_mod);
@@ -18,8 +20,7 @@ function CarDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rentalDays, setRentalDays] = useState(1);
-  const navigate = useNavigate();
-  const dispatchAction = useDispatch();
+
 
   useEffect(() => {
     const fetchCarDetails = async () => {
@@ -72,6 +73,8 @@ function CarDetailsPage() {
     fetchCarDetails();
   }, [carId, currUser?.data?.token]);
 
+  
+
   const postReview = async (reviewData) => {
     try {
       const response = await fetch(`/api/v1/reviews/createReview`, {
@@ -102,6 +105,10 @@ function CarDetailsPage() {
   const handlePayment = async () => {
     if (currUser && currUser.data && currUser.data.token) {
       try {
+        const stripe = await loadStripe(
+          "pk_test_51Oy4XrKDZmp8eDSbYQN6Fam0JxugYee73NJNswgl4U5QrS20yiYAYDseStP3Orj0YnIMFjWWMwWX3r5i0qBE1wVX00FJbX1o30"
+        );
+
         const stripeRes = await fetch(
           "http://localhost:5173/api/v1/rent/stripePayment",
           {
@@ -111,11 +118,9 @@ function CarDetailsPage() {
               Authorization: `Bearer ${currUser.data.token}`,
             },
             body: JSON.stringify({
-              items: {
                 duration: rentalDays,
                 cost: carDetails.pricePerDay,
-                id: carDetails._id,
-              },
+                item_id: carDetails._id,
             }),
           }
         );
@@ -123,11 +128,12 @@ function CarDetailsPage() {
           throw new Error(`Failed to fetch client secret: ${stripeRes.status}`);
         }
 
-        const stripeData = await stripeRes.json();
-        console.log("stripeData", stripeData.data.clientSecret);
-        dispatchAction(setClientSecret(stripeData.data.clientSecret));
-        navigate("/checkout");
-        // Redirect or handle client secret
+        const session = await stripeRes.json();
+        console.log("sesss", session);
+        const result = stripe.redirectToCheckout({
+          sessionId:session.data.id
+        });
+
       } catch (error) {
         console.error("Error fetching client secret:", error);
       }
@@ -170,7 +176,7 @@ function CarDetailsPage() {
   const backLink = "/Listingpage";
 
   return (
-    <div className="min-h-screen bg-customcolor-100 py-10">
+    <div className="min-h-screen bg-customcolor-100 py-10" style={nightStyles}>
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between mb-6">
           <Link

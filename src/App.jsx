@@ -30,6 +30,8 @@ const stripePromise = loadStripe(
 
 function App() {
   const { cartItems, isAddedToCart, handleAddToCart, clientSecret, userId } = useCart();
+  const { currUser } = useSelector((state) => state.user_mod);
+  
 
   const appearance = {
     theme: "stripe",

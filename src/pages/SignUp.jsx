@@ -41,7 +41,7 @@ export default function SignUp() {
   };
   return (
     <div className=" p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7 text-white">
+      <h1 className="text-3xl text-center font-semibold my-7 text-black">
         Create New Account
       </h1>
       <form onSubmit={submitFormHandler} className="flex flex-col gap-4">
@@ -67,7 +67,7 @@ export default function SignUp() {
           onChange={formChangeInputHandler}
         />
 
-        <label htmlFor="securityQuestion" className="text-white text-xl">
+        <label htmlFor="securityQuestion" className="text-black text-xl">
           What is your favourite color?
         </label>
         <input
@@ -78,7 +78,7 @@ export default function SignUp() {
           onChange={formChangeInputHandler}
         ></input>
 
-        <label htmlFor="securityQuestion" className="text-xl text-white">
+        <label htmlFor="securityQuestion" className="text-xl text-black">
           what is your favourite season?
         </label>
         <input
