@@ -4,39 +4,33 @@ const formatDate = (dateString) => {
   const options = { year: "numeric", month: "long", day: "numeric" }; // Choose options that suit your needs
   return new Date(dateString).toLocaleDateString(undefined, options); // The 'undefined' argument uses the browser's default locale
 };
-const AdminListingCard = ({ car, onDenial, onApproval }) => {
-  const availableFromDate = formatDate(car.availableFrom);
-  const availableToDate = formatDate(car.availableTo);
-  // Function to handle the delete action
-  
+const ComplaintListingCard = ({ complaint, onDenial, onApproval }) => {
 
   return (
     <div className="flex flex-col bg-white p-4 rounded-lg shadow-md mb-4">
       <div className="p-1 mb-4">
         <div className="uppercase tracking-wide text-sm text-black font-bold">
-          {car.carMake} {car.carModel}
+          Complaint
         </div>
-        <p className="text-gray-700 text-base">Year: {car.year}</p>
-
+        <p className="text-gray-700 text-base mt-2">Reported Id: {complaint._id}</p>
         <p className="text-gray-700 text-base">
-          Price Per Day: ${car.pricePerDay}
+          Owner Id: {complaint.itemOwnerId}
         </p>
+        
         <p className="text-gray-700 text-base">
-          Available From: {availableFromDate}
+          Complaint: {complaint.comment}
         </p>
-        <p className="text-gray-700 text-base">
-          Available To: {availableToDate}
-        </p>
+        
       </div>
       <div className="flex justify-end space-x-3">
         <button
-          onClick={() => onApproval(car._id)}
+          onClick={() => onApproval(complaint._id)}
           className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-400 transition duration-300"
         >
           Approve
         </button>
         <button
-          onClick={() => onDenial(car._id)}
+          onClick={() => onDenial(complaint._id)}
           className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-400 transition duration-300"
         >
           Deny
@@ -46,4 +40,4 @@ const AdminListingCard = ({ car, onDenial, onApproval }) => {
   );
 };
 
-export default AdminListingCard;
+export default ComplaintListingCard;

@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import { useSelector } from "react-redux";
 import SearchLocationInput from "../components/MapComponents/GooglePlacesApi";
-
+import RentedItemsCard from "../components/RentedItemsCard";
 
 export default function CreateListing() {
   const [listings, setListings] = useState([]);
+  const [showListings, setShowListings] = useState(false);
+  const [rentedItems, setRentedItems] = useState([]);
+  const [showRentedItems, setShowRentedItems] = useState(false);
+
+  const toggleListings = () => {
+    setShowListings(!showListings);
+  };
+  const toggleRentedItems = () => {
+    setShowRentedItems(true);
+    setShowListings(false);
+  };
+
   const { currUser } = useSelector((state) => state.user_mod);
   const [formData, setFormData] = useState({
     carMake: "",
@@ -21,33 +33,53 @@ export default function CreateListing() {
     availableFrom: "",
     availableTo: "",
     location: "",
-    image_url: []
+    image_url: [],
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const { currItemLocation } = useSelector((state) => state.item_mod);
   const navigator = useNavigate();
 
-
   const fetchListings = async () => {
     try {
-      const response = await fetch('/api/v1/cars/getAllOwnerCarsListings', {
+      const response = await fetch("/api/v1/cars/getAllOwnerCarsListings", {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${currUser?.data?.token}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
+        },
       });
       const data = await response.json();
       console.log(data);
       if (data && Array.isArray(data.data)) {
         setListings(data.data);
       } else {
-        console.log('Unexpected response structure:', data);
+        console.log("Unexpected response structure:", data);
       }
     } catch (error) {
-      console.error('Failed to fetch listings:', error);
+      console.error("Failed to fetch listings:", error);
     }
   };
+
+  const fetchRentedItems = async () => {
+    try {
+      const response = await fetch("/api/v1/rent/itemRentedByUser", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+      if (data && Array.isArray(data.data)) {
+        setRentedItems(data.data);
+      } else {
+        console.log("Unexpected response structure:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch listings:", error);
+    }
+  };
+
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
@@ -56,13 +88,14 @@ export default function CreateListing() {
   }, [currItemLocation]);
   useEffect(() => {
     fetchListings();
+    fetchRentedItems();
   }, [currUser?.token, currUser?.id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -78,20 +111,20 @@ export default function CreateListing() {
     }
 
     try {
-      const response = await fetch('/api/v1/image/uploadImage/', {
-        method: 'POST',
+      const response = await fetch("/api/v1/image/uploadImage/", {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${currUser?.data?.token}`,
         },
-        body: formData
+        body: formData,
       });
 
-      if (!response.ok) throw new Error('Failed to upload images');
+      if (!response.ok) throw new Error("Failed to upload images");
       const { data } = await response.json();
       console.log(data);
       return data.urls;
     } catch (error) {
-      console.error('Error uploading images:', error);
+      console.error("Error uploading images:", error);
       return [];
     }
   };
@@ -99,17 +132,15 @@ export default function CreateListing() {
     setFormData({
       ...car,
       availableFrom: car.availableFrom.slice(0, 10),
-      availableTo: car.availableTo.slice(0, 10)
+      availableTo: car.availableTo.slice(0, 10),
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     let currentFormData = { ...formData };
-
 
     if (selectedFiles.length > 0) {
       try {
@@ -124,26 +155,27 @@ export default function CreateListing() {
 
     console.log(currentFormData);
 
-    const endpoint = currentFormData._id ? `/api/v1/cars/updateCarListings/${currentFormData._id}` : '/api/v1/cars/createCarListings';
-    const method = currentFormData._id ? 'PATCH' : 'POST';
+    const endpoint = currentFormData._id
+      ? `/api/v1/cars/updateCarListings/${currentFormData._id}`
+      : "/api/v1/cars/createCarListings";
+    const method = currentFormData._id ? "PATCH" : "POST";
 
     try {
       const response = await fetch(endpoint, {
         method: method,
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${currUser?.data?.token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currUser?.data?.token}`,
         },
-        body: JSON.stringify(currentFormData)
+        body: JSON.stringify(currentFormData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save the car listing');
+        throw new Error("Failed to save the car listing");
       }
 
       const createdListing = await response.json();
       console.log("Listing created:", createdListing);
-
 
       // Reset the form data
       setFormData({
@@ -160,14 +192,11 @@ export default function CreateListing() {
         location: "",
       });
       await fetchListings();
-      navigator('/Listingpage', { replace: true, state: { refresh: true } });
-
+      navigator("/Listingpage", { replace: true, state: { refresh: true } });
     } catch (error) {
       console.error("Error creating listing:", error);
-
     }
   };
-
 
   const handleDelete = async (carId) => {
     try {
@@ -185,7 +214,6 @@ export default function CreateListing() {
           errorData.message || "Failed to delete the car listing"
         );
       }
-
 
       setListings((currentListings) =>
         currentListings.filter((car) => car._id !== carId)
@@ -363,21 +391,44 @@ export default function CreateListing() {
       </div>
       <div className="w-1/2 p-12">
         <div className="flex flex-col">
-          <h2 className="text-2xl font-semibold mb-4">Your Listed Rides</h2>
-          <div className="space-y-4">
-            {
-              listings.length > 0 &&
-              listings.map((car) => (
-                <ListingCard
-                  key={car._id}
-                  car={car}
-                  onUpdate={() => handleUpdate(car)}
-                  onDelete={() => handleDelete(car._id)}
-                />
-              ))
-            }
-
-          </div>
+          <h2 className="text-2xl font-semibold mb-4">
+            <a href="#" className="inline-block mr-4" onClick={toggleListings}>
+              Your Listed Rides
+            </a>{" "}
+            |{" "}
+            <a
+              href="#"
+              className="inline-block ml-4"
+              onClick={toggleRentedItems}
+            >
+              Your Rented Items
+            </a>
+          </h2>
+          {showListings && (
+            <div className="space-y-4">
+              {listings.length > 0 &&
+                listings.map((car) => (
+                  <ListingCard
+                    key={car._id}
+                    car={car}
+                    onUpdate={() => handleUpdate(car)}
+                    onDelete={() => handleDelete(car._id)}
+                  />
+                ))}
+            </div>
+          )}
+          {showRentedItems && (
+            <div>
+               {rentedItems.length > 0 &&
+                rentedItems.map((car) => (
+                  <RentedItemsCard
+                    key={car._id}
+                    car={car}
+                    onFileComplaint={() => onFileComplaint(car._id)}
+                  />
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

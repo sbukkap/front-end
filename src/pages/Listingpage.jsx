@@ -290,7 +290,7 @@ return (
           <FaSearch />
         </button>
       </form>
-    <h1 className="text-3xl font-bold text-center mb-6">
+    <h1 className="text-3xl text-white font-bold text-center mb-6">
       AVAILABLE CARS FOR RENT
     </h1>
 
