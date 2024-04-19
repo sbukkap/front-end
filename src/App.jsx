@@ -29,7 +29,7 @@ const stripePromise = loadStripe(
 );
 
 function App() {
-  const { cartItems, isAddedToCart, handleAddToCart, clientSecret, userId } = useCart();
+  const { cartItems, setCartItems, handleAddToCart, clientSecret, userId } = useCart();
 
   const appearance = {
     theme: "stripe",
@@ -52,10 +52,10 @@ function App() {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/Createlisting" element={<Createlisting />} />
-          <Route path="/Listingpage" element={<Listingpage handleAddToCart={handleAddToCart} />} />
+          <Route path="/Listingpage" element={<Listingpage handleAddToCart={handleAddToCart} cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/paymentSuccess" element={<PaymentSucess/>} />
           <Route path="/paymentFailure" element={<PaymentFailure/>} />
-          <Route path="/Cart" element={<Cart cartItems={cartItems} />} />
+          <Route path="/Cart" element={<Cart cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route element={<PrivateRoute />}>
             <Route path="/modify-listing" element={<AdminRentalApprove />} />
           </Route>

@@ -12,11 +12,19 @@ function formatDate(isoString) {
   });
 }
 
-export const ListingCard = ({ car, handleAddToCart }) => {
-
+export const ListingCard = ({ car, handleAddToCart, cartItems }) => {
   const placeholderImage = "../../assets/car2.jpg";
   const formattedAvailableFrom = formatDate(car.availableFrom);
   const formattedAvailableTo = formatDate(car.availableTo);
+
+
+  const isInCart = cartItems && cartItems[0] && cartItems[0].items ? cartItems[0].items.some(item => item._id === car._id) : false;
+
+  const handleClick = async () => {
+    console.log(cartItems)
+    handleAddToCart(car)
+  };
+
   
   return (
 <div className="max-w-sm rounded overflow-hidden shadow-lg m-4 bg-white">
@@ -49,9 +57,30 @@ export const ListingCard = ({ car, handleAddToCart }) => {
           >
             View Details
           </Link>
-      <button onClick={() => handleAddToCart(car)} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline">
+      {/* <button onClick={handleClick} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline">
         Add to Cart
+      </button> */}
+
+      <button
+          onClick={handleClick}
+          disabled={isInCart}
+          className={`${
+              isInCart ? 'bg-gray-400' : 'bg-yellow-500 hover:bg-yellow-600'
+          } text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline`}
+      >
+          {isInCart ? 'Added' : 'Add to Cart'}
       </button>
+
+      {/* <button
+        // onClick={() => handleAddToCart(car)}
+        onClick={handleClick}
+        disabled={added}
+        className={`${
+          added ? 'bg-gray-400' : 'bg-yellow-500 hover:bg-yellow-600'
+        } text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline`}
+      >
+        {added ? 'Added' : 'Add to Cart'}
+      </button> */}
         
       </li>
     
@@ -88,16 +117,42 @@ const FilterDropdown = ({ label, options, selectedOption, onChange }) => {
 };
 
 
-export default function Listingpage(props) {
+export default function Listingpage({ handleAddToCart, cartItems, setCartItems }) {
   // Initialize state with empty array or example data if you want to show something initially
 
   const [cars, setCars] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({}); // State to hold filter values
-
-  const { currUser } = useSelector((state) => state.user_mod);
+  // const { currUser } = useSelector((state) => state.user_mod);
+  const { currUser, clientSecret } = useSelector((state) => state.user_mod);
+  const userId = currUser ? currUser.data.username : null;
   const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchCartItems = async () => {
+    try {
+      console.log(currUser?.data?.token)
+      const response = await fetch(`/api/v1/shoppingCart/get_Shoppingcart/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${currUser?.data?.token}`,
+        },
+      });
+      const data = await response.json();
+      setCartItems(data.data);
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+        fetchCartItems();
+    }
+}, []);
+
+  // fetchCartItems();
 
   const handleSearch = async () => {
     console.log(searchQuery)
@@ -329,7 +384,7 @@ return (
         <p className="mx-auto">Loading...</p>
       ) : cars.length > 0 ? (
         cars.map((car) => (
-            <ListingCard key={`${car.id}-${Math.random()}`} car={car} handleAddToCart={props.handleAddToCart} />
+            <ListingCard key={`${car.id}-${Math.random()}`} car={car} handleAddToCart={handleAddToCart} cartItems={cartItems} />
           ))
       ) : (
         <p className="mx-auto">No listings available.</p>

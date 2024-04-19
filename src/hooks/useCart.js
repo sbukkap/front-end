@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 const useCart = () => {
   const { currUser, clientSecret } = useSelector((state) => state.user_mod);
   const [cartItems, setCartItems] = useState([]);
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const userId = currUser ? currUser.data.username : null;
   var cartExists = false;
 
@@ -27,6 +26,7 @@ const useCart = () => {
 
   const fetchCartItems = async () => {
     try {
+      console.log(currUser?.data?.token)
       const response = await fetch(`/api/v1/shoppingCart/get_Shoppingcart/${userId}`, {
         method: 'GET',
         headers: {
@@ -56,8 +56,8 @@ const useCart = () => {
       if (response.ok) {
         const data = await response.json();
         setCartItems([data.data]); // Set the updated cartItems
-        console.log([data.data]);
-        alert('Item added to cart');
+        // console.log([data.data]);
+        // alert('Item added to cart');
       } else {
         throw new Error('Network response was not ok');
       }
@@ -67,10 +67,9 @@ const useCart = () => {
   };
 
   const handleAddToCart = async (item) => {
-    setIsAddedToCart(true);
     try {
       await checkCartExistence(); // Wait for the result of checkCartExistence()
-      console.log(cartExists);
+      // console.log(cartExists);
       if (!cartExists) {
         const response = await fetch(`/api/v1/shoppingCart/createShoppingcart`, {
           method: 'POST',
@@ -88,7 +87,7 @@ const useCart = () => {
         if (response.ok) {
           const data = await response.json();
           setCartItems([data.data]);
-          alert('Item added to cart');
+          // alert('Item added to cart');
         } else {
           throw new Error('Network response was not ok');
         }
@@ -99,12 +98,12 @@ const useCart = () => {
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
+  // return true;
   };
 
   return {
     cartItems,
     setCartItems,
-    isAddedToCart,
     handleAddToCart,
     clientSecret,
     userId,

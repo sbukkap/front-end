@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ListingCard } from './Listingpage';
 
-const Cart = () => {
+const Cart = ({ cartItems, setCartItems }) => {
   const { currUser } = useSelector((state) => state.user_mod);
   const userId = currUser ? currUser.data.username : null;
   
-  const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
   const fetchCartItems = async () => {
@@ -51,18 +50,12 @@ const Cart = () => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${currUser?.data?.token}`, // Include authorization header if needed
+          user_id: userId
         },
       });
   
       // Check if the response is successful
       if (response.ok) {
-        // Update the cartItems state to remove the deleted item
-        // setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
-
-        // setCartItems((prevItems) => {
-        //   // console.log(prevItems[0].items.filter((item) => item._id !== itemId))
-        //   return prevItems[0].items.filter((item) => item._id !== itemId)
-        // });
 
         setCartItems((prevItems) => {
           // Create a copy of the current cartItems state
@@ -75,7 +68,7 @@ const Cart = () => {
           return [updatedCart];
         });
 
-        alert('Item deleted successfully!');
+        // alert('Item deleted successfully!');
       } else {
         // Handle error case
         console.error('Error deleting item:', response.statusText);
@@ -125,15 +118,20 @@ const Cart = () => {
 
   return (
     <div>
-      <h2>Shopping Cart</h2>
+      <h1 className="text-3xl font-bold text-center mb-6">
+        SHOPPING CART
+      </h1>
+
+      {/* Render cart items */}
       {cartItems && cartItems[0] && cartItems[0].items.map(item => (
-        <div key={item._id}>
-          {/* Replace the inner div structure with the ListingCard component */}
-          <ListingCard
-            key={item._id} // Use the item._id as a unique key
-            car={item} // Pass the item as the car prop
-          />
-          {/* Add a delete button to allow deleting items from the cart */}
+        <div key={item._id} className="flex items-center justify-between bg-black p-4 rounded shadow-md mb-4">
+          {/* Car details */}
+          <div className="flex flex-col text-white">
+            <p className="font-bold">{`${item.carMake} ${item.carModel}`}</p>
+            <p>Price Per Day: ${item.pricePerDay}</p>
+          </div>
+
+          {/* Delete button */}
           <button
             onClick={() => handleDeleteFromCart(item._id)}
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
@@ -142,8 +140,18 @@ const Cart = () => {
           </button>
         </div>
       ))}
-      <p>Total Price: ${totalPrice}</p>
-      <button>Proceed to Payment</button>
+
+      {/* Total price */}
+      <div className="font-bold text-right mb-4">
+        Total Price: ${totalPrice}
+      </div>
+
+      {/* Proceed to payment button */}
+      <div className="text-right">
+        <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Proceed to Payment
+        </button>
+      </div>
     </div>
   );
   
