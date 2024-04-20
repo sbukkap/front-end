@@ -35,20 +35,25 @@ const Cart = ({ cartItems, setCartItems }) => {
         const stripe = await loadStripe(
           "pk_test_51Oy4XrKDZmp8eDSbYQN6Fam0JxugYee73NJNswgl4U5QrS20yiYAYDseStP3Orj0YnIMFjWWMwWX3r5i0qBE1wVX00FJbX1o30"
         );
-
+  
         // Calculate the total duration for all items
-        let totalDuration = 1;
+        let totalDuration = 0;
         Object.values(rentalDays).forEach((duration) => {
           totalDuration += duration;
         });
 
+        if (totalDuration == 0) {
+            totalDuration =1
+        }
+        
+  
         // Calculate the total cost for all items
         let totalCost = 0;
         cartItems[0].items.forEach((item) => {
           const itemRentalDays = rentalDays[item._id] || 1; // Default to 1 day if not set
-          totalCost += item.pricePerDay * itemRentalDays;
+          totalCost += item.pricePerDay;
         });
-
+  
         const stripeRes = await fetch(
           "http://localhost:5173/api/v1/rent/stripePayment",
           {
@@ -67,9 +72,9 @@ const Cart = ({ cartItems, setCartItems }) => {
         if (!stripeRes.ok) {
           throw new Error(`Failed to fetch client secret: ${stripeRes.status}`);
         }
-
+  
         const session = await stripeRes.json();
-
+  
         const result = stripe.redirectToCheckout({
           sessionId: session.data.id,
         });
@@ -78,6 +83,7 @@ const Cart = ({ cartItems, setCartItems }) => {
       }
     }
   };
+  
 
   const calculateTotalPrice = () => {
     let total = 0;
