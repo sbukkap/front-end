@@ -36,22 +36,15 @@ const Cart = ({ cartItems, setCartItems }) => {
           "pk_test_51Oy4XrKDZmp8eDSbYQN6Fam0JxugYee73NJNswgl4U5QrS20yiYAYDseStP3Orj0YnIMFjWWMwWX3r5i0qBE1wVX00FJbX1o30"
         );
   
-        // Calculate the total duration for all items
-        let totalDuration = 0;
-        Object.values(rentalDays).forEach((duration) => {
-          totalDuration += duration;
-        });
-
-        if (totalDuration == 0) {
-            totalDuration =1
-        }
-        
+        // Construct arrays to store durations and costs for each item
+        const durations = [];
+        const costs = [];
   
-        // Calculate the total cost for all items
-        let totalCost = 0;
         cartItems[0].items.forEach((item) => {
           const itemRentalDays = rentalDays[item._id] || 1; // Default to 1 day if not set
-          totalCost += item.pricePerDay;
+          const itemCost = item.pricePerDay * itemRentalDays;
+          durations.push(itemRentalDays);
+          costs.push(itemCost);
         });
   
         const stripeRes = await fetch(
@@ -63,9 +56,9 @@ const Cart = ({ cartItems, setCartItems }) => {
               Authorization: `Bearer ${currUser.data.token}`,
             },
             body: JSON.stringify({
-              duration: totalDuration, // Send the total duration as a single integer
-              cost: totalCost, // Send the total cost calculated above
-              item_id: cartItems[0].items.map((item) => item._id), // Send an array of item IDs
+              durations: durations,
+              costs: costs,
+              item_ids: cartItems[0].items.map((item) => item._id),
             }),
           }
         );
@@ -83,6 +76,8 @@ const Cart = ({ cartItems, setCartItems }) => {
       }
     }
   };
+  
+  
   
 
   const calculateTotalPrice = () => {
