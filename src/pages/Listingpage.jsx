@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FaSearch } from "react-icons/fa";
+import Chatbot from "../components/chatbot";
 
 function formatDate(isoString) {
   const date = new Date(isoString);
@@ -390,7 +391,7 @@ return (
         <p className="mx-auto">No listings available.</p>
       )}
     </section>
+    <Chatbot/>
   </main>
 );
 }
-

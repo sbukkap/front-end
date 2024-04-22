@@ -4,6 +4,7 @@ import { useSelector} from "react-redux";
 import { Rating } from "@mui/material";
 import { nightStyles } from "../constants/constants";
 import { loadStripe } from "@stripe/stripe-js";
+import Chatbot from "../components/chatbot";
 
 
 function CarDetailsPage() {
@@ -335,7 +336,9 @@ function CarDetailsPage() {
               >
                 Proceed to Payment
               </button>
+              
             </div>
+            <Chatbot/>
           </div>
         </div>
       </div>

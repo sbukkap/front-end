@@ -5,6 +5,7 @@ import ListingCard from "../components/ListingCard";
 import { useSelector } from "react-redux";
 import SearchLocationInput from "../components/MapComponents/GooglePlacesApi";
 import RentedItemsCard from "../components/RentedItemsCard";
+import Chatbot from "../components/chatbot";
 
 export default function CreateListing() {
   const [listings, setListings] = useState([]);
@@ -387,7 +388,9 @@ export default function CreateListing() {
             </button>
           </div>
           <Outlet />
+         
         </form>
+        <Chatbot/>
       </div>
       <div className="w-1/2 p-12">
         <div className="flex flex-col">
@@ -427,7 +430,9 @@ export default function CreateListing() {
                     onFileComplaint={() => onFileComplaint(car._id)}
                   />
                 ))}
+                
             </div>
+            
           )}
         </div>
       </div>
