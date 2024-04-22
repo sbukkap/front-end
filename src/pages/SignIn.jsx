@@ -56,7 +56,7 @@ export default function SignUp() {
   
   return (
     <div className=" p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Welcome</h1>
+      <h1 className="text-3xl text-center font-semibold my-7 text-white">Welcome</h1>
       <form onSubmit={submitFormHandler} className="flex flex-col gap-4">
         <input
           type="email"
@@ -83,12 +83,12 @@ export default function SignUp() {
       </form>
       <div className="flex gap-2 mt-5">
         <button
-          className="text-blue-700 underline cursor-pointer"
+          className="text-blue-700 underline cursor-pointer text-white"
           onClick={() => setforgotFlag(!forgotFlag)}
         >
           Forgot Password?
         </button>
-        <p>New User?</p>
+        <p className="text-white">New User?</p>
         <Link to={"/sign-up"}>
           <span className="text-blue-700">Sign up</span>
         </Link>

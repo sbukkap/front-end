@@ -15,8 +15,9 @@ export default function ItemLocation() {
 
   return (
     <div>
-      <h1>Item Location</h1>
-      <p>Information about the item or location goes here.</p>
+      <h1 className="text-white font-roboto" style={{ fontSize: '2rem', position: 'relative', left: '730px', display: 'inline' }}><b>ITEM LOCATION</b></h1>
+      <br />
+      <p className="text-white font-roboto" style={{ fontSize: '2rem', position: 'relative', left: '490px', display: 'inline' }}><b>Information about the item or location goes here</b></p>
       {/* Pass the lat and lng to the MapComponent */}
       <MapComponent selectedLocation={{ lat, lng }} />
     </div>
