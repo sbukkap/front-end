@@ -6,6 +6,8 @@ import { Services } from "../components/services";
 import { Contact } from "../components/contact";
 import JsonData from "../data/data.json";
 import SmoothScroll from "smooth-scroll";
+import Chatbot from "../components/chatbot";
+
 
 
 import "./Home.css";
@@ -34,6 +36,7 @@ const Home = () => {
       <About id="about-section" data={landingPageData.About} />
       <Services data={landingPageData.Services} />
       <Contact data={landingPageData.Contact} /> 
+      <Chatbot/>
     </div>
   );
 };

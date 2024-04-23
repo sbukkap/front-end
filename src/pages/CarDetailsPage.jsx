@@ -4,6 +4,7 @@ import { useSelector} from "react-redux";
 import { Rating } from "@mui/material";
 import { nightStyles } from "../constants/constants";
 import { loadStripe } from "@stripe/stripe-js";
+import Chatbot from "../components/chatbot";
 
 
 function CarDetailsPage() {
@@ -179,12 +180,14 @@ function CarDetailsPage() {
     <div className="min-h-screen bg-customcolor-100 py-10" style={nightStyles}>
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between mb-6">
-          <Link
-            to={backLink}
-            className="text-blue-600 hover:text-blue-700 py-2 px-8 transition duration-300"
-          >
-            ← Go back
-          </Link>
+        <Link
+  to={backLink}
+  className="bg-white text-black py-2 px-8 transition duration-300 rounded-full border border-black hover:bg-gray-300"
+  style={{ display: 'inline-block' }}
+>
+  ← Go back
+</Link>
+
           <Link
             to={mapLink}
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full transition ease-in-out duration-300"
@@ -335,7 +338,9 @@ function CarDetailsPage() {
               >
                 Proceed to Payment
               </button>
+              
             </div>
+            <Chatbot/>
           </div>
         </div>
       </div>
