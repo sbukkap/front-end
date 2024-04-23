@@ -419,14 +419,17 @@ export default function CreateListing() {
           )}
           {showRentedItems && (
             <div>
-               {rentedItems.length > 0 &&
-                rentedItems.map((car) => (
-                  <RentedItemsCard
-                    key={car._id}
-                    car={car}
-                    onFileComplaint={() => onFileComplaint(car._id)}
-                  />
-                ))}
+              {rentedItems.length > 0 &&
+                rentedItems.map(
+                  (car) =>
+                    car && (
+                      <RentedItemsCard
+                        key={car._id}
+                        car={car}
+                        onFileComplaint={() => onFileComplaint(car._id)}
+                      />
+                    )
+                )}
             </div>
           )}
         </div>
