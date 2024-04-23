@@ -1,8 +1,12 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch} from "react-redux";
 
 export default function ForgotPassword() {
   const [forgotFormValues, setForgotFormValues] = useState({});
+  const navigator = useNavigate();
+  const dispatchAction = useDispatch();
 
   const forgotFormChangeInputHandler = (event) => {
     setForgotFormValues({
