@@ -29,14 +29,15 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="navbar flex items-center justify-between px-10 py-4 bg-floralwhite">
-      <Link to="/" className="text-2xl font-semibold">
-        <img src={logo} alt="Logo" className="h-10 mr-4" />
+    <nav className="navbar flex items-center justify-between px-10 py-4 bg-transparent text-white">
+      <Link to="/" className="text-2xl font-semibold font-montserrat">
+        <img src={logo} alt="Logo" className="h-10 mr-4" style={{ position: 'relative', display: 'inline' }}/>
         HPASS RENTALS
       </Link>
+
       <div className="md:hidden">
         <button
-          className="block text-gray-800 hover:text-gray-900 focus:text-gray-900 focus:outline-none"
+          className="block text-white hover:text-gray-200 focus:text-gray-200 focus:outline-none"
           onClick={() => setMenuDraw(!menuDraw)}
         >
           <svg
@@ -70,34 +71,34 @@ export const Navbar = () => {
       >
         <ul className="md:flex flex-col md:flex-row md:ml-auto md:mr-0 items-center">
           <li>
-            <button className="md:ml-4 text-lg font-bold text-black bg-transparent  rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
+            <button className="md:ml-4 text-lg font-bold bg-transparent rounded-md px-4 py-2 transition-colors hover:bg-white hover:text-black">
               <Link to="/">Home</Link>
             </button>
           </li>
           {currUser?.data?.username === "admin" && (
             <li>
-              <button className="md:ml-4 text-lg font-bold text-black bg-transparent  rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
+              <button className="md:ml-4 text-lg font-bold bg-transparent rounded-md px-4 py-2 transition-colors hover:bg-white hover:text-black">
                 <Link to="/modify-listing">Admin Page</Link>
               </button>
             </li>
           )}
           <li>
-            <button className="md:ml-4 text-lg font-bold text-black bg-transparent  rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
+            <button className="md:ml-4 text-lg font-bold bg-transparent rounded-md px-4 py-2 transition-colors hover:bg-white hover:text-black">
               <Link to="/Listingpage">Browse</Link>
             </button>
           </li>
           {currUser?.data?.username ? (
             <li>
-            <button
-              onClick={handleSignOut}
-              className= "md:ml-4 text-lg font-bold text-black  bg-red-500  rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white"
-            >
-              Sign Out
-            </button>
-          </li>
+              <button
+                onClick={handleSignOut}
+                className="md:ml-4 text-lg font-bold bg-red-500 rounded-md px-4 py-2 transition-colors hover:bg-white hover:text-black"
+              >
+                Sign Out
+              </button>
+            </li>
           ) : (
             <li>
-              <button className="md:ml-4 text-lg font-bold text-black bg-transparent  rounded-md px-4 py-2 transition-colors hover:bg-black hover:text-white">
+              <button className="md:ml-4 text-lg font-bold bg-transparent rounded-md px-4 py-2 transition-colors hover:bg-white hover:text-black">
                 <Link to="/sign-up">Register</Link>
               </button>
             </li>

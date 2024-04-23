@@ -147,25 +147,28 @@ const Cart = ({ cartItems, setCartItems }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto p-8">
-        <h1 className="text-3xl font-bold text-center mb-6">SHOPPING CART</h1>
+        {/* <h1 className="text-3xl font-bold text-center mb-6">SHOPPING CART</h1> */}
+        <h1 className="text-white font-bold text-center mb-6" style={{ fontSize: '3.5rem', position: 'relative', bottom: '45px', left: '530px', display: 'inline' }}>
+  SHOPPING CART
+</h1>
 
         {cartItems &&
           cartItems[0] &&
           cartItems[0].items.map((item) => (
             <div
               key={item._id}
-              className="flex items-center justify-between bg-gray-800 p-4 rounded-lg shadow-md mb-4"
+              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md mb-4"
             >
               {/* Car details */}
               <div className="flex flex-col">
-                <p className="font-bold text-white">{`${item.carMake} ${item.carModel}`}</p>
-                <p className="text-white">Price Per Day: ${item.pricePerDay}</p>
+                <p className="font-bold text-black">{`${item.carMake} ${item.carModel}`}</p>
+                <p className="text-black">Price Per Day: ${item.pricePerDay}</p>
                 <div className="flex items-center mt-2">
                   <label
                     htmlFor={`rentalDays-${item._id}`}
-                    className="mr-2 text-white"
+                    className="mr-2 text-black"
                   >
                     Rental Days:
                   </label>
