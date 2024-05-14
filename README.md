@@ -1,3 +1,4 @@
+(this is the frontend repository for out final project in Software Engineering course. The theme is 'Car Rentals', im forking it here so that i could showcase it in my list of repos for employers to check if needed :) )
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
